@@ -1,6 +1,7 @@
 
 import struct
 import numpy as np
+from qtpy import os
 
 class configPacket:
     # just a container for the packets
@@ -25,6 +26,9 @@ class Bitstream:
         elif filename.endswith('.bin'):
             self._raw_bytes = None
 
+        self.configBitstream = None
+        self.decodedPackets = None
+
     def parse_bits(self):
         
         decodedPackets = []
@@ -42,7 +46,7 @@ class Bitstream:
         self.header = self._raw_bytes[:rawBytes.find(syncWord)]
         rem = self._raw_bytes[rawBytes.find(syncWord) + 12:]
         configPackets = rem.reshape(-1,4).view(np.uint32).newbyteorder().flatten()
-        hexPackets = [hex(pkt)[2:].zfill(8) for pkt in configPackets]
+        # hexPackets = [hex(pkt)[2:].zfill(8) for pkt in configPackets]
 
         # documented configuration registers and opcodes
         opcodes = ['NOP', 'read', 'write']
@@ -68,28 +72,45 @@ class Bitstream:
                 if opcodes[opcode] == 'NOP':
                     decodedPackets.append(configPacket(pktType,opcodes[opcode],addr,pld))
                 elif opcode == 1 or opcode == 2:
-                    payload, _configPackets = _configPackets[0:pld], _configPackets[pld:]
+
+                    if pld > 0:
+                        payload, _configPackets = _configPackets[0:pld], _configPackets[pld:]
+                    
+                    else:
+                        t2Pkt = _configPackets.pop(0)
+
+                        if t2Pkt >> 29 != 2:
+                            print("type 2 packet required")
+                            break
+                        else:
+                            pld = t2Pkt & 0x7FFFFFF
+                            opcode = (t2Pkt >> 27) & 0x3
+
+                        payload, _configPackets = _configPackets[0:pld], _configPackets[pld:]
+
+                    if pld > 1000:
+                        self.configBitstream = payload
+
                     decodedPackets.append(configPacket(pktType,opcodes[opcode],registers.get(addr, 'UNDEFINED'),payload))
                     
-                else:
-                    print('hi')
-            
             else:
                 test = struct.unpack("<I", struct.pack(">I", pkt))[0]
-                print('hi')
             
+        self.decodedPackets = decodedPackets
 
-        p1NOP = 0b00
-        p1Read = 0b01
-        p1Write = 0b10
 
-        # nopPackets = np.where(packetTypes == p1NOP)
-        # readPackets = np.where(packetTypes == p1Read)
-        # writePackets = np.where(packetTypes == p1Write)
+    def analyze_configuration(self):
 
+        bits = np.array(self.configBitstream)
+        nonzero = np.count_nonzero(bits)
+
+        whereNonzero = np.where(bits>0)
 
         print('hi')
 
+
 if __name__ == "__main__":
-    garoBits = Bitstream("Bitstreams/core_driver.bit")
-    garoBits.parse_bits()
+    print(os.listdir())
+    multBits = Bitstream("FPGA-RE/Bitstreams/core_driver.bit")
+    multBits.parse_bits()
+    multBits.analyze_configuration()

@@ -1,8 +1,21 @@
 
-import os
+import struct
 import numpy as np
 
-
+class configPacket:
+    # just a container for the packets
+    def __init__(self,pktType,opcode,addr,data):
+        self.pktType    = pktType
+        self.opcode     = opcode
+        self.addr       = addr
+        self.data       = data
+        
+    def __repr__(self):
+        if self.opcode == 'NOP':
+            return 'NOP'
+        else:
+            return f'packet({self.pktType},{self.opcode},{self.addr},{self.data})'
+            
 class Bitstream:
 
     def __init__(self, filename):
@@ -13,6 +26,8 @@ class Bitstream:
             self._raw_bytes = None
 
     def parse_bits(self):
+        
+        decodedPackets = []
         
         # word occurs after the main file header
         sync = 0xFFFFFFFFFFFFFFFFAA995566
@@ -26,29 +41,55 @@ class Bitstream:
         
         self.header = self._raw_bytes[:rawBytes.find(syncWord)]
         rem = self._raw_bytes[rawBytes.find(syncWord) + 12:]
-        configPackets = rem.reshape(-1,4).view(np.uint32).flatten()
-        test = [hex(pkt)[2:].zfill(8) for pkt in configPackets]
-        # configBits = np.unpackbits(configPackets, 1)
-        packetTypes = configPackets >> 29
-        pktsTyped = []
-        pktsTypedInds = []
-        for i in range(8):
-            pktsTypedInds.append(np.where(packetTypes == i)[0].tolist())
-            pktsTyped.append(configPackets[pktsTypedInds[-1]].tolist())
+        configPackets = rem.reshape(-1,4).view(np.uint32).newbyteorder().flatten()
+        hexPackets = [hex(pkt)[2:].zfill(8) for pkt in configPackets]
 
-
+        # documented configuration registers and opcodes
+        opcodes = ['NOP', 'read', 'write']
+        
+        registers = {0:'CRC', 1:'FAR', 2: 'FDRI', 3: 'FDRO', 4: 'CMD',
+                    5: 'CTL0', 6: 'MASK', 7: 'STAT', 8: 'LOUT', 9: 'COR0',
+                    10: 'MFWR', 11: 'CBC', 12: 'IDCODE', 13: 'AXSS', 14: 'COR1',
+                    16: 'WBSTAR', 17: 'TIMER', 19: 'RBCRC_SW', 22: 'BOOTSTS', 24: 'CTL1',
+                    31: 'BSPI'
+                }
+        
+        _configPackets = configPackets.tolist()
+        while _configPackets:
+        # for pkt in configPackets:
+            pkt = _configPackets.pop(0)
+            pktType = pkt >> 29
+            
+            if pktType == 1:
+                opcode = (pkt >> 27) & 0x3
+                addr   = (pkt >> 13) & 0x1F
+                pld    = pkt & 0x3FF
+                
+                if opcodes[opcode] == 'NOP':
+                    decodedPackets.append(configPacket(pktType,opcodes[opcode],addr,pld))
+                elif opcode == 1 or opcode == 2:
+                    payload, _configPackets = _configPackets[0:pld], _configPackets[pld:]
+                    decodedPackets.append(configPacket(pktType,opcodes[opcode],registers.get(addr, 'UNDEFINED'),payload))
+                    
+                else:
+                    print('hi')
+            
+            else:
+                test = struct.unpack("<I", struct.pack(">I", pkt))[0]
+                print('hi')
+            
 
         p1NOP = 0b00
         p1Read = 0b01
         p1Write = 0b10
 
-        nopPackets = np.where(packetTypes == p1NOP)
-        readPackets = np.where(packetTypes == p1Read)
-        writePackets = np.where(packetTypes == p1Write)
+        # nopPackets = np.where(packetTypes == p1NOP)
+        # readPackets = np.where(packetTypes == p1Read)
+        # writePackets = np.where(packetTypes == p1Write)
 
 
         print('hi')
 
 if __name__ == "__main__":
-    garoBits = Bitstream("Bitstreams/GARO_TRNG.bit")
+    garoBits = Bitstream("Bitstreams/core_driver.bit")
     garoBits.parse_bits()

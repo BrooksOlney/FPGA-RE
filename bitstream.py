@@ -108,6 +108,7 @@ class Bitstream:
 
         print('hi')
 
+    def 
 
 if __name__ == "__main__":
     print(os.listdir())

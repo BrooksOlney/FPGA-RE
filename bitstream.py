@@ -1,7 +1,7 @@
 
+import json
 import struct
 import numpy as np
-from qtpy import os
 
 class configPacket:
     # just a container for the packets
@@ -108,10 +108,13 @@ class Bitstream:
 
         print('hi')
 
-    def 
+    def load_tile_grid(self, filename):
+        self.tileDef = json.load(open(filename,'r'))
+
 
 if __name__ == "__main__":
-    print(os.listdir())
-    multBits = Bitstream("FPGA-RE/Bitstreams/core_driver.bit")
+    multBits = Bitstream("Bitstreams/primitives.bit")
     multBits.parse_bits()
+    multBits.load_tile_grid("prjxray-db/artix7/xc7a100t/tilegrid.json")
     multBits.analyze_configuration()
+8

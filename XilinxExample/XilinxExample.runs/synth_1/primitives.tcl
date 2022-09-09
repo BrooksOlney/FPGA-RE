@@ -4,7 +4,7 @@
 
 set TIME_start [clock seconds] 
 namespace eval ::optrace {
-  variable script "F:/Research/XilinxExample.runs/synth_1/primitives.tcl"
+  variable script "F:/Research/FPGA-RE/XilinxExample/XilinxExample.runs/synth_1/primitives.tcl"
   variable category "vivado_synth"
 }
 
@@ -73,20 +73,23 @@ OPTRACE "synth_1" START { ROLLUP_AUTO }
 set_param chipscope.maxJobs 8
 set_param xicom.use_bs_reader 1
 OPTRACE "Creating in-memory project" START { }
-create_project -in_memory -part xc7a100tftg256-2
+create_project -in_memory -part xa7a12tcpg238-2I
 
 set_param project.singleFileAddWarning.threshold 0
 set_param project.compositeFile.enableAutoGeneration 0
 set_param synth.vivado.isSynthRun true
-set_property webtalk.parent_dir F:/Research/XilinxExample.cache/wt [current_project]
-set_property parent.project_path F:/Research/XilinxExample.xpr [current_project]
+set_property webtalk.parent_dir F:/Research/FPGA-RE/XilinxExample/XilinxExample.cache/wt [current_project]
+set_property parent.project_path F:/Research/FPGA-RE/XilinxExample/XilinxExample.xpr [current_project]
 set_property default_lib xil_defaultlib [current_project]
 set_property target_language Verilog [current_project]
-set_property ip_output_repo f:/Research/XilinxExample.cache/ip [current_project]
+set_property ip_output_repo f:/Research/FPGA-RE/XilinxExample/XilinxExample.cache/ip [current_project]
 set_property ip_cache_permissions {read write} [current_project]
 OPTRACE "Creating in-memory project" END { }
 OPTRACE "Adding files" START { }
-read_verilog -library xil_defaultlib F:/Research/XilinxExample.srcs/sources_1/new/primitives.v
+read_verilog -library xil_defaultlib {
+  F:/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/sources_1/imports/HW/weights_rom.v
+  F:/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/sources_1/new/primitives.v
+}
 OPTRACE "Adding files" END { }
 # Mark all dcp files as not used in implementation to prevent them from being
 # stitched into the results of this synthesis run. Any black boxes in the
@@ -96,14 +99,14 @@ OPTRACE "Adding files" END { }
 foreach dcp [get_files -quiet -all -filter file_type=="Design\ Checkpoint"] {
   set_property used_in_implementation false $dcp
 }
-read_xdc F:/Research/XilinxExample.srcs/constrs_1/new/a100.xdc
-set_property used_in_implementation false [get_files F:/Research/XilinxExample.srcs/constrs_1/new/a100.xdc]
+read_xdc F:/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/constrs_1/new/a12.xdc
+set_property used_in_implementation false [get_files F:/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/constrs_1/new/a12.xdc]
 
 set_param ips.enableIPCacheLiteLoad 1
 close [open __synthesis_is_running__ w]
 
 OPTRACE "synth_design" START { }
-synth_design -top primitives -part xc7a100tftg256-2
+synth_design -top primitives -part xa7a12tcpg238-2I
 OPTRACE "synth_design" END { }
 if { [get_msg_config -count -severity {CRITICAL WARNING}] > 0 } {
  send_msg_id runtcl-6 info "Synthesis results are not added to the cache due to CRITICAL_WARNING"

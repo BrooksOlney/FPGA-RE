@@ -113,8 +113,12 @@ class Bitstream:
 
 
 if __name__ == "__main__":
-    multBits = Bitstream("Bitstreams/primitives.bit")
+    multBits = Bitstream("Bitstreams/primitives2.bit")
     multBits.parse_bits()
+    multBitsopp = Bitstream("Bitstreams/primitives_opposite.bit")
+    multBitsopp.parse_bits()
+    
+    test = np.array(multBits.configBitstream) ^ np.array(multBitsopp.configBitstream)
+    
     multBits.load_tile_grid("prjxray-db/artix7/xc7a100t/tilegrid.json")
     multBits.analyze_configuration()
-8

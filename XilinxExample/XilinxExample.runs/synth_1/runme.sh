@@ -24,7 +24,7 @@ else
 fi
 export LD_LIBRARY_PATH
 
-HD_PWD='F:/Research/XilinxExample.runs/synth_1'
+HD_PWD='F:/Research/FPGA-RE/XilinxExample/XilinxExample.runs/synth_1'
 cd "$HD_PWD"
 
 HD_LOG=runme.log

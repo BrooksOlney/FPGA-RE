@@ -17,7 +17,7 @@ proc create_report { reportName command } {
   }
 }
 namespace eval ::optrace {
-  variable script "F:/Research/XilinxExample.runs/impl_1/primitives.tcl"
+  variable script "F:/Research/FPGA-RE/XilinxExample/XilinxExample.runs/impl_1/primitives.tcl"
   variable category "vivado_impl"
 }
 
@@ -125,24 +125,24 @@ set rc [catch {
   set_param chipscope.maxJobs 8
   set_param xicom.use_bs_reader 1
 OPTRACE "create in-memory project" START { }
-  create_project -in_memory -part xc7a100tftg256-2
+  create_project -in_memory -part xa7a12tcpg238-2I
   set_property design_mode GateLvl [current_fileset]
   set_param project.singleFileAddWarning.threshold 0
 OPTRACE "create in-memory project" END { }
 OPTRACE "set parameters" START { }
-  set_property webtalk.parent_dir F:/Research/XilinxExample.cache/wt [current_project]
-  set_property parent.project_path F:/Research/XilinxExample.xpr [current_project]
-  set_property ip_output_repo F:/Research/XilinxExample.cache/ip [current_project]
+  set_property webtalk.parent_dir F:/Research/FPGA-RE/XilinxExample/XilinxExample.cache/wt [current_project]
+  set_property parent.project_path F:/Research/FPGA-RE/XilinxExample/XilinxExample.xpr [current_project]
+  set_property ip_output_repo F:/Research/FPGA-RE/XilinxExample/XilinxExample.cache/ip [current_project]
   set_property ip_cache_permissions {read write} [current_project]
 OPTRACE "set parameters" END { }
 OPTRACE "add files" START { }
-  add_files -quiet F:/Research/XilinxExample.runs/synth_1/primitives.dcp
+  add_files -quiet F:/Research/FPGA-RE/XilinxExample/XilinxExample.runs/synth_1/primitives.dcp
 OPTRACE "read constraints: implementation" START { }
-  read_xdc F:/Research/XilinxExample.srcs/constrs_1/new/a100.xdc
+  read_xdc F:/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/constrs_1/new/a12.xdc
 OPTRACE "read constraints: implementation" END { }
 OPTRACE "add files" END { }
 OPTRACE "link_design" START { }
-  link_design -top primitives -part xc7a100tftg256-2
+  link_design -top primitives -part xa7a12tcpg238-2I
 OPTRACE "link_design" END { }
 OPTRACE "gray box cells" START { }
 OPTRACE "gray box cells" END { }

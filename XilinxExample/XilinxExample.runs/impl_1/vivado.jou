@@ -2,8 +2,8 @@
 # Vivado v2020.2 (64-bit)
 # SW Build 3064766 on Wed Nov 18 09:12:45 MST 2020
 # IP Build 3064653 on Wed Nov 18 14:17:31 MST 2020
-# Start of session at: Thu Sep  8 23:10:36 2022
-# Process ID: 36964
+# Start of session at: Sat Sep 10 01:00:17 2022
+# Process ID: 40000
 # Current directory: F:/Research/FPGA-RE/XilinxExample/XilinxExample.runs/impl_1
 # Command line: vivado.exe -log primitives.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source primitives.tcl -notrace
 # Log file: F:/Research/FPGA-RE/XilinxExample/XilinxExample.runs/impl_1/primitives.vdi

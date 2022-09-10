@@ -13,6 +13,26 @@ set_property -dict {PACKAGE_PIN L17 IOSTANDARD LVCMOS33} [get_ports {op[5]}]
 
 ## RGB LEDs
 set_property -dict {PACKAGE_PIN N19 IOSTANDARD LVCMOS33} [get_ports lutOut]
+
+set_property -dict {PACKAGE_PIN A1 IOSTANDARD LVCMOS33} [get_ports {data[0]}]
+set_property -dict {PACKAGE_PIN A3 IOSTANDARD LVCMOS33} [get_ports {data[1]}]
+set_property -dict {PACKAGE_PIN A5 IOSTANDARD LVCMOS33} [get_ports {data[2]}]
+set_property -dict {PACKAGE_PIN A7 IOSTANDARD LVCMOS33} [get_ports {data[3]}]
+set_property -dict {PACKAGE_PIN A9 IOSTANDARD LVCMOS33} [get_ports {data[4]}]
+set_property -dict {PACKAGE_PIN A19 IOSTANDARD LVCMOS33} [get_ports {data[5]}]
+set_property -dict {PACKAGE_PIN B3 IOSTANDARD LVCMOS33} [get_ports {data[6]}]
+set_property -dict {PACKAGE_PIN B5 IOSTANDARD LVCMOS33} [get_ports {data[7]}]
+
+#A1   GND                           NA                 NA    NA            NA                  NA        NA
+#A3   GND                           NA                 NA    NA            NA                  NA        NA
+#A5   GND                           NA                 NA    NA            NA                  NA        NA
+#A7   GND                           NA                 NA    NA            NA                  NA        NA
+#A9   GND                           NA                 NA    NA            NA                  NA        NA
+#A19  GND                           NA                 NA    NA            NA                  NA        NA
+#B3   GND                           NA                 NA    NA            NA                  NA        NA
+#B5   GND                           NA                 NA    NA            NA                  NA        NA
+
+
 #K17  IO_L12P_T1_MRCC_14            1                  14    NA            NA                  HR        NA
 #L17  IO_L12N_T1_MRCC_14            1                  14    NA            NA                  HR        NA
 #N19  IO_L13P_T2_MRCC_14            2                  14    NA            NA                  HR        NA
@@ -255,5 +275,10 @@ set_property -dict {PACKAGE_PIN N19 IOSTANDARD LVCMOS33} [get_ports lutOut]
 #C14  VCCO_15                       NA                 15    NA            NA                  NA        NA
 #C18  VCCO_15                       NA                 15    NA            NA                  NA        NA
 #G13  VCCO_15                       NA                 15    NA            NA                  NA        NA
-                                                                                                        
+         set_property BEL D6LUT [get_cells U4]
+set_property LOC SLICE_X0Y0 [get_cells U4]            
+
+#         set_property BEL D6LUT [get_cells U4]
+#set_property LOC SLICE_X0Y0 [get_cells U4]         
+                                                                                   
 #Total Number of Pins, 238                                                                                                   

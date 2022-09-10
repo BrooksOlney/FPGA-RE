@@ -2,13 +2,15 @@
 import json
 import struct
 import numpy as np
+from zlib import crc32
+import enum
 
 class configPacket:
     # just a container for the packets
     def __init__(self,pktType,opcode,addr,data):
         self.pktType    = pktType
-        self.opcode     = opcode
-        self.addr       = addr
+        self.opcode     = self.Opcodes(opcode)
+        self.addr       = self.Address(addr)
         self.data       = data
         
     def __repr__(self):
@@ -16,7 +18,37 @@ class configPacket:
             return 'NOP'
         else:
             return f'packet({self.pktType},{self.opcode},{self.addr},{self.data})'
-            
+    
+    # documented configuration registers 
+    class Address(enum.Enum):
+        CRC = 0
+        FAR = 1
+        FDR = 2
+        FDR0 = 3
+        CMD = 4
+        CTL0 = 5
+        MASK = 6
+        STAT = 7
+        LOUT = 8
+        COR0 = 9
+        MFWR = 10
+        CBC = 11
+        IDCODE = 12
+        AXSS = 13
+        COR1 = 14
+        WBSTAR = 16
+        TIMER = 17
+        RBCRC_SW = 19
+        BOOTSTS = 22
+        CTL1 = 24
+        BSPI = 31
+        
+    # documented opcodes
+    class Opcodes(enum.Enum):
+        NOP = 0
+        read = 1
+        write = 2
+    
 class Bitstream:
 
     def __init__(self, filename):
@@ -48,15 +80,6 @@ class Bitstream:
         configPackets = rem.reshape(-1,4).view(np.uint32).newbyteorder().flatten()
         # hexPackets = [hex(pkt)[2:].zfill(8) for pkt in configPackets]
 
-        # documented configuration registers and opcodes
-        opcodes = ['NOP', 'read', 'write']
-        
-        registers = {0:'CRC', 1:'FAR', 2: 'FDRI', 3: 'FDRO', 4: 'CMD',
-                    5: 'CTL0', 6: 'MASK', 7: 'STAT', 8: 'LOUT', 9: 'COR0',
-                    10: 'MFWR', 11: 'CBC', 12: 'IDCODE', 13: 'AXSS', 14: 'COR1',
-                    16: 'WBSTAR', 17: 'TIMER', 19: 'RBCRC_SW', 22: 'BOOTSTS', 24: 'CTL1',
-                    31: 'BSPI'
-                }
         
         _configPackets = configPackets.tolist()
         while _configPackets:
@@ -69,8 +92,8 @@ class Bitstream:
                 addr   = (pkt >> 13) & 0x1F
                 pld    = pkt & 0x3FF
                 
-                if opcodes[opcode] == 'NOP':
-                    decodedPackets.append(configPacket(pktType,opcodes[opcode],addr,pld))
+                if opcode == configPacket.Opcodes.NOP.value:
+                    decodedPackets.append(configPacket(pktType,opcode,addr,pld))
                 elif opcode == 1 or opcode == 2:
 
                     if pld > 0:
@@ -91,7 +114,7 @@ class Bitstream:
                     if pld > 1000:
                         self.configBitstream = payload
 
-                    decodedPackets.append(configPacket(pktType,opcodes[opcode],registers.get(addr, 'UNDEFINED'),payload))
+                    decodedPackets.append(configPacket(pktType,opcode,addr,payload))
                     
             else:
                 test = struct.unpack("<I", struct.pack(">I", pkt))[0]
@@ -112,13 +135,28 @@ class Bitstream:
         self.tileDef = json.load(open(filename,'r'))
 
 
+
 if __name__ == "__main__":
-    multBits = Bitstream("Bitstreams/primitives2.bit")
+    multBits = Bitstream("Bitstreams/bram_0s.bit")
     multBits.parse_bits()
-    multBitsopp = Bitstream("Bitstreams/primitives_opposite.bit")
+    multBitsopp = Bitstream("Bitstreams/bram_1s.bit")
     multBitsopp.parse_bits()
     
     test = np.array(multBits.configBitstream) ^ np.array(multBitsopp.configBitstream)
+
+    # crc = 0    
+    # crc32poly = 0x82F63B78
+    # pkts = [pkt for pkt in multBits.decodedPackets if pkt.opcode == configPacket.Opcodes.write and pkt.addr != configPacket.Address.BOOTSTS]
+    # for pkt in pkts:
+    #     for data in pkt.data:
+    #         val = (pkt.addr.value << 32) | data
+            
+    #         for i in range(0,37):
+    #             if (val & 1) != (crc & 1):
+    #                 crc ^= (crc32poly << 1)
+                
+    #             val >>= 1
+    #             crc >>= 1
     
     multBits.load_tile_grid("prjxray-db/artix7/xc7a100t/tilegrid.json")
     multBits.analyze_configuration()

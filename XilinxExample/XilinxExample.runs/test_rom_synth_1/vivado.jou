@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2020.2 (64-bit)
+# SW Build 3064766 on Wed Nov 18 09:12:45 MST 2020
+# IP Build 3064653 on Wed Nov 18 14:17:31 MST 2020
+# Start of session at: Sat Sep 10 00:57:39 2022
+# Process ID: 46840
+# Current directory: F:/Research/FPGA-RE/XilinxExample/XilinxExample.runs/test_rom_synth_1
+# Command line: vivado.exe -log test_rom.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source test_rom.tcl
+# Log file: F:/Research/FPGA-RE/XilinxExample/XilinxExample.runs/test_rom_synth_1/test_rom.vds
+# Journal file: F:/Research/FPGA-RE/XilinxExample/XilinxExample.runs/test_rom_synth_1\vivado.jou
+#-----------------------------------------------------------
+source test_rom.tcl -notrace

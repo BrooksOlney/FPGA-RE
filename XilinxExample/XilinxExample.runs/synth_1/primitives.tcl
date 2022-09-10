@@ -78,18 +78,21 @@ create_project -in_memory -part xa7a12tcpg238-2I
 set_param project.singleFileAddWarning.threshold 0
 set_param project.compositeFile.enableAutoGeneration 0
 set_param synth.vivado.isSynthRun true
+set_msg_config -source 4 -id {IP_Flow 19-2162} -severity warning -new_severity info
 set_property webtalk.parent_dir F:/Research/FPGA-RE/XilinxExample/XilinxExample.cache/wt [current_project]
 set_property parent.project_path F:/Research/FPGA-RE/XilinxExample/XilinxExample.xpr [current_project]
+set_property XPM_LIBRARIES XPM_MEMORY [current_project]
 set_property default_lib xil_defaultlib [current_project]
 set_property target_language Verilog [current_project]
 set_property ip_output_repo f:/Research/FPGA-RE/XilinxExample/XilinxExample.cache/ip [current_project]
 set_property ip_cache_permissions {read write} [current_project]
 OPTRACE "Creating in-memory project" END { }
 OPTRACE "Adding files" START { }
-read_verilog -library xil_defaultlib {
-  F:/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/sources_1/imports/HW/weights_rom.v
-  F:/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/sources_1/new/primitives.v
-}
+add_files f:/Research/FPGA-RE/test_init.coe
+read_verilog -library xil_defaultlib F:/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/sources_1/new/primitives.v
+read_ip -quiet f:/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/sources_1/ip/test_rom/test_rom.xci
+set_property used_in_implementation false [get_files -all f:/Research/FPGA-RE/XilinxExample/XilinxExample.gen/sources_1/ip/test_rom/test_rom_ooc.xdc]
+
 OPTRACE "Adding files" END { }
 # Mark all dcp files as not used in implementation to prevent them from being
 # stitched into the results of this synthesis run. Any black boxes in the

@@ -1,0 +1,2 @@
+test_rom.v,verilog,xil_defaultlib,../../../../XilinxExample.gen/sources_1/ip/test_rom/sim/test_rom.v,
+glbl.v,Verilog,xil_defaultlib,glbl.v

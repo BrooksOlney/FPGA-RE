@@ -1,7 +1,7 @@
 Copyright 1986-2020 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2020.2 (win64) Build 3064766 Wed Nov 18 09:12:45 MST 2020
-| Date             : Thu Sep  8 23:11:00 2022
+| Date             : Sat Sep 10 01:00:42 2022
 | Host             : BrooksRig running 64-bit major release  (build 9200)
 | Command          : report_power -file primitives_power_routed.rpt -pb primitives_power_summary_routed.pb -rpx primitives_power_routed.rpx
 | Design           : primitives
@@ -30,14 +30,14 @@ Table of Contents
 ----------
 
 +--------------------------+--------------+
-| Total On-Chip Power (W)  | 0.065        |
+| Total On-Chip Power (W)  | 0.073        |
 | Design Power Budget (W)  | Unspecified* |
 | Power Budget Margin (W)  | NA           |
-| Dynamic (W)              | 0.004        |
-| Device Static (W)        | 0.061        |
+| Dynamic (W)              | 0.010        |
+| Device Static (W)        | 0.063        |
 | Effective TJA (C/W)      | 6.2          |
-| Max Ambient (C)          | 99.6         |
-| Junction Temperature (C) | 25.4         |
+| Max Ambient (C)          | 99.5         |
+| Junction Temperature (C) | 25.5         |
 | Confidence Level         | Low          |
 | Setting File             | ---          |
 | Simulation Activity File | ---          |
@@ -56,11 +56,11 @@ Table of Contents
 | Slice Logic    |    <0.001 |        3 |       --- |             --- |
 |   LUT as Logic |    <0.001 |        1 |      8000 |            0.01 |
 |   Others       |     0.000 |        2 |       --- |             --- |
-| Signals        |    <0.001 |       13 |       --- |             --- |
-| Block RAM      |    <0.001 |      0.5 |        20 |            2.50 |
-| I/O            |     0.003 |        8 |       112 |            7.14 |
-| Static Power   |     0.061 |          |           |                 |
-| Total          |     0.065 |          |           |                 |
+| Signals        |    <0.001 |       15 |       --- |             --- |
+| Block RAM      |     0.002 |        1 |        20 |            5.00 |
+| I/O            |     0.008 |       16 |       112 |           14.29 |
+| Static Power   |     0.063 |          |           |                 |
+| Total          |     0.073 |          |           |                 |
 +----------------+-----------+----------+-----------+-----------------+
 
 
@@ -70,11 +70,11 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
-| Vccint    |       1.000 |     0.006 |       0.001 |      0.005 |       NA    | Unspecified | NA         |
-| Vccaux    |       1.800 |     0.010 |       0.000 |      0.009 |       NA    | Unspecified | NA         |
-| Vcco33    |       3.300 |     0.002 |       0.001 |      0.001 |       NA    | Unspecified | NA         |
+| Vccint    |       1.000 |     0.007 |       0.002 |      0.005 |       NA    | Unspecified | NA         |
+| Vccaux    |       1.800 |     0.010 |       0.001 |      0.009 |       NA    | Unspecified | NA         |
+| Vcco33    |       3.300 |     0.001 |       0.000 |      0.001 |       NA    | Unspecified | NA         |
 | Vcco25    |       2.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
-| Vcco18    |       1.800 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
+| Vcco18    |       1.800 |     0.004 |       0.003 |      0.001 |       NA    | Unspecified | NA         |
 | Vcco15    |       1.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | Vcco135   |       1.350 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | Vcco12    |       1.200 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
@@ -136,11 +136,13 @@ Table of Contents
 3.1 By Hierarchy
 ----------------
 
-+------------+-----------+
-| Name       | Power (W) |
-+------------+-----------+
-| primitives |     0.004 |
-|   rom      |     0.001 |
-+------------+-----------+
++------------------------+-----------+
+| Name                   | Power (W) |
++------------------------+-----------+
+| primitives             |     0.010 |
+|   rom                  |     0.002 |
+|     U0                 |     0.002 |
+|       inst_blk_mem_gen |     0.002 |
++------------------------+-----------+
 
 

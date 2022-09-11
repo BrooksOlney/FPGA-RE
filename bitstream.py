@@ -4,6 +4,7 @@ import struct
 import numpy as np
 from zlib import crc32
 import enum
+from time import time
 
 class configPacket:
     # just a container for the packets
@@ -82,6 +83,10 @@ class Bitstream:
 
         
         _configPackets = configPackets.tolist()
+        cmdIssued = False
+        configured = False
+        self.crcBytes = bytes()
+
         while _configPackets:
         # for pkt in configPackets:
             pkt = _configPackets.pop(0)
@@ -93,11 +98,13 @@ class Bitstream:
                 pld    = pkt & 0x3FF
                 
                 if opcode == configPacket.Opcodes.NOP.value:
-                    decodedPackets.append(configPacket(pktType,opcode,addr,pld))
+                    decodedPackets.append(configPacket(pktType,opcode,addr,[pld]))
                 elif opcode == 1 or opcode == 2:
+                    
+
 
                     if pld > 0:
-                        payload, _configPackets = _configPackets[0:pld], _configPackets[pld:]
+                        payload, _configPackets = np.array(_configPackets[0:pld]), _configPackets[pld:]
                     
                     else:
                         t2Pkt = _configPackets.pop(0)
@@ -109,11 +116,20 @@ class Bitstream:
                             pld = t2Pkt & 0x7FFFFFF
                             opcode = (t2Pkt >> 27) & 0x3
 
-                        payload, _configPackets = _configPackets[0:pld], _configPackets[pld:]
+                        payload, _configPackets = np.array(_configPackets[0:pld]), _configPackets[pld:]
+
+                    if cmdIssued and not configured:
+                        # self.crcBytes += pkt.to_bytes(4,'big') + np.array(payload,dtype=np.uint32).byteswap().tobytes()
+                        self.crcBytes += ((addr << 32) | payload).byteswap().tobytes()
 
                     if pld > 1000:
-                        self.configBitstream = payload
+                        self.configBitstream = np.array(payload)
+                        configured = True
 
+                    if addr == configPacket.Address.CMD.value and payload[0] == 0x7:
+                        cmdIssued = True
+
+                    
                     decodedPackets.append(configPacket(pktType,opcode,addr,payload))
                     
             else:
@@ -137,26 +153,34 @@ class Bitstream:
 
 
 if __name__ == "__main__":
-    multBits = Bitstream("Bitstreams/bram_0s.bit")
+    multBits = Bitstream("FPGA-RE/Bitstreams/bram_0s.bit")
     multBits.parse_bits()
-    multBitsopp = Bitstream("Bitstreams/bram_1s.bit")
+    multBitsopp = Bitstream("FPGA-RE/Bitstreams/bram_1s.bit")
     multBitsopp.parse_bits()
     
     test = np.array(multBits.configBitstream) ^ np.array(multBitsopp.configBitstream)
 
-    # crc = 0    
-    # crc32poly = 0x82F63B78
-    # pkts = [pkt for pkt in multBits.decodedPackets if pkt.opcode == configPacket.Opcodes.write and pkt.addr != configPacket.Address.BOOTSTS]
-    # for pkt in pkts:
-    #     for data in pkt.data:
-    #         val = (pkt.addr.value << 32) | data
-            
-    #         for i in range(0,37):
-    #             if (val & 1) != (crc & 1):
-    #                 crc ^= (crc32poly << 1)
+    crc = 0    
+    crc32poly = 0x82F63B78 << 1
+    s = time()
+    for pkt in multBits.decodedPackets[8:30]:
+        if pkt.opcode != configPacket.Opcodes.write:
+            continue
+        # for data in pkt.data:
+        #     val = (pkt.addr.value << 32) | data
+        for val in ((pkt.addr.value << 32) | pkt.data):
+        #     crc = crc32(val)
+        # vals = ((pkt.addr.value << 32) | pkt.data).tobytes()
+        # for i in range(len(vals)// 5) :
+        #     val = vals[i*5:(i+1)*5]
+        #     crc = crc32(val)
+            for i in range(0,37):
+                # if (val & 1) != (crc & 1):
+                if ((val ^ crc) & 1):
+                    crc ^= crc32poly
                 
-    #             val >>= 1
-    #             crc >>= 1
-    
-    multBits.load_tile_grid("prjxray-db/artix7/xc7a100t/tilegrid.json")
+                val >>= 1
+                crc >>= 1
+    e = time() - s
+    multBits.load_tile_grid("FPGA-RE/prjxray-db/artix7/xc7a100t/tilegrid.json")
     multBits.analyze_configuration()

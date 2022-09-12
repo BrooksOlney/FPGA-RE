@@ -169,12 +169,12 @@ class Bitstream:
         return crc
 
 if __name__ == "__main__":
-    multBits = Bitstream("FPGA-RE/Bitstreams/bram_0s.bit")
+    multBits = Bitstream("FPGA-RE/Bitstreams/primitives.bit")
     multBits.parse_bits()
     multBitsopp = Bitstream("FPGA-RE/Bitstreams/bram_1s.bit")
     multBitsopp.parse_bits()
     
-    test = np.array(multBits.configBitstream) ^ np.array(multBitsopp.configBitstream)
+    # test = np.array(multBits.configBitstream) ^ np.array(multBitsopp.configBitstream)
     multBits.analyze_configuration()
 
     multBits.load_tile_grid("FPGA-RE/prjxray-db/artix7/xc7a100t/tilegrid.json")

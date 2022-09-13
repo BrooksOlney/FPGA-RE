@@ -145,6 +145,20 @@ class Bitstream:
         frames = bits.reshape(-1,101)
         whereNonzero = np.where(bits>0)
 
+        gcr = 'global_clock_regions'
+        cbs = 'configuration_buses'
+        cols = 'configuration_columns'
+        numFrames = 0
+        for key in self.tileDef[gcr]:
+            # print(key)
+            for row in self.tileDef[gcr][key]['rows']:
+                for cb in self.tileDef[gcr][key]['rows'][row][cbs]:
+                    for col in self.tileDef[gcr][key]['rows'][row][cbs][cb][cols]:
+                        numFrames += self.tileDef[gcr][key]['rows'][row][cbs][cb][cols][col]['frame_count']
+
+                        if numFrames == 1944:
+                            print('hi')
+
         print('hi')
 
     def load_tile_grid(self, filename):
@@ -169,13 +183,15 @@ class Bitstream:
         return crc
 
 if __name__ == "__main__":
-    multBits = Bitstream("FPGA-RE/Bitstreams/primitives.bit")
+    multBits = Bitstream("FPGA-RE/Bitstreams/bram_xca100t.bit")
     multBits.parse_bits()
-    multBitsopp = Bitstream("FPGA-RE/Bitstreams/bram_1s.bit")
+    multBitsopp = Bitstream("FPGA-RE/Bitstreams/bram_xca100t_opp.bit")
     multBitsopp.parse_bits()
     
-    # test = np.array(multBits.configBitstream) ^ np.array(multBitsopp.configBitstream)
-    multBits.analyze_configuration()
+    test = np.array(multBits.configBitstream) ^ np.array(multBitsopp.configBitstream)
+    # multBits.analyze_configuration()
 
-    multBits.load_tile_grid("FPGA-RE/prjxray-db/artix7/xc7a100t/tilegrid.json")
+    multBits.load_tile_grid("FPGA-RE/prjxray-db/artix7/xc7a100tftg256-2/part.json")
+    # multBits.load_tile_grid("FPGA-RE/prjxray-db/artix7/xc7a100t/tilegrid.json")
+    
     multBits.analyze_configuration()

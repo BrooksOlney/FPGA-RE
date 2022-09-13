@@ -17,7 +17,7 @@ proc create_report { reportName command } {
   }
 }
 namespace eval ::optrace {
-  variable script "F:/Research/FPGA-RE/XilinxExample/XilinxExample.runs/impl_1/primitives.tcl"
+  variable script "D:/Research/FPGA-RE/XilinxExample/XilinxExample.runs/impl_1/primitives.tcl"
   variable category "vivado_impl"
 }
 
@@ -122,29 +122,28 @@ start_step init_design
 set ACTIVE_STEP init_design
 set rc [catch {
   create_msg_db init_design.pb
-  set_param chipscope.maxJobs 8
-  set_param xicom.use_bs_reader 1
+  set_param chipscope.maxJobs 2
 OPTRACE "create in-memory project" START { }
-  create_project -in_memory -part xa7a12tcpg238-2I
+  create_project -in_memory -part xc7a100tftg256-2
   set_property design_mode GateLvl [current_fileset]
   set_param project.singleFileAddWarning.threshold 0
 OPTRACE "create in-memory project" END { }
 OPTRACE "set parameters" START { }
-  set_property webtalk.parent_dir F:/Research/FPGA-RE/XilinxExample/XilinxExample.cache/wt [current_project]
-  set_property parent.project_path F:/Research/FPGA-RE/XilinxExample/XilinxExample.xpr [current_project]
-  set_property ip_output_repo F:/Research/FPGA-RE/XilinxExample/XilinxExample.cache/ip [current_project]
+  set_property webtalk.parent_dir D:/Research/FPGA-RE/XilinxExample/XilinxExample.cache/wt [current_project]
+  set_property parent.project_path D:/Research/FPGA-RE/XilinxExample/XilinxExample.xpr [current_project]
+  set_property ip_output_repo D:/Research/FPGA-RE/XilinxExample/XilinxExample.cache/ip [current_project]
   set_property ip_cache_permissions {read write} [current_project]
   set_property XPM_LIBRARIES XPM_MEMORY [current_project]
 OPTRACE "set parameters" END { }
 OPTRACE "add files" START { }
-  add_files -quiet F:/Research/FPGA-RE/XilinxExample/XilinxExample.runs/synth_1/primitives.dcp
-  read_ip -quiet f:/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/sources_1/ip/test_rom/test_rom.xci
+  add_files -quiet D:/Research/FPGA-RE/XilinxExample/XilinxExample.runs/synth_1/primitives.dcp
+  read_ip -quiet d:/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/sources_1/ip/blk_mem_gen_0/blk_mem_gen_0.xci
 OPTRACE "read constraints: implementation" START { }
-  read_xdc F:/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/constrs_1/new/a12.xdc
+  read_xdc D:/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/constrs_1/new/a100.xdc
 OPTRACE "read constraints: implementation" END { }
 OPTRACE "add files" END { }
 OPTRACE "link_design" START { }
-  link_design -top primitives -part xa7a12tcpg238-2I
+  link_design -top primitives -part xc7a100tftg256-2 
 OPTRACE "link_design" END { }
 OPTRACE "gray box cells" START { }
 OPTRACE "gray box cells" END { }
@@ -283,10 +282,10 @@ OPTRACE "route_design reports" START { REPORT }
 OPTRACE "route_design reports" END { }
 OPTRACE "route_design misc" START { }
   close_msg_db -file route_design.pb
-OPTRACE "route_design write_checkpoint" START { CHECKPOINT }
-OPTRACE "route_design write_checkpoint" END { }
 } RESULT]
 if {$rc} {
+OPTRACE "route_design write_checkpoint" START { CHECKPOINT }
+OPTRACE "route_design write_checkpoint" END { }
   write_checkpoint -force primitives_routed_error.dcp
   step_failed route_design
   return -code error $RESULT

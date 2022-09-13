@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GenRun Id="impl_1" LaunchPart="xa7a12tcpg238-2I" LaunchTime="1662785987">
-  <File Type="BITSTR-BMM" Name="primitives_bd.bmm"/>
-  <File Type="OPT-METHODOLOGY-DRC" Name="primitives_methodology_drc_opted.rpt"/>
-  <File Type="INIT-TIMING" Name="primitives_timing_summary_init.rpt"/>
+<GenRun Id="impl_1" LaunchPart="xc7a100tftg256-2" LaunchTime="1663031569">
   <File Type="ROUTE-PWR" Name="primitives_power_routed.rpt"/>
   <File Type="PA-TCL" Name="primitives.tcl"/>
-  <File Type="OPT-TIMING" Name="primitives_timing_summary_opted.rpt"/>
-  <File Type="OPT-DCP" Name="primitives_opt.dcp"/>
+  <File Type="BITSTR-MMI" Name="primitives.mmi"/>
+  <File Type="OPT-METHODOLOGY-DRC" Name="primitives_methodology_drc_opted.rpt"/>
+  <File Type="INIT-TIMING" Name="primitives_timing_summary_init.rpt"/>
   <File Type="ROUTE-PWR-SUM" Name="primitives_power_summary_routed.pb"/>
   <File Type="REPORTS-TCL" Name="primitives_reports.tcl"/>
+  <File Type="OPT-TIMING" Name="primitives_timing_summary_opted.rpt"/>
+  <File Type="OPT-DCP" Name="primitives_opt.dcp"/>
   <File Type="OPT-DRC" Name="primitives_drc_opted.rpt"/>
   <File Type="OPT-HWDEF" Name="primitives.hwdef"/>
   <File Type="PWROPT-DCP" Name="primitives_pwropt.dcp"/>
@@ -22,13 +22,14 @@
   <File Type="PLACE-CTRL" Name="primitives_control_sets_placed.rpt"/>
   <File Type="PLACE-SIMILARITY" Name="primitives_incremental_reuse_placed.rpt"/>
   <File Type="PLACE-PRE-SIMILARITY" Name="primitives_incremental_reuse_pre_placed.rpt"/>
+  <File Type="BG-BIN" Name="primitives.bin"/>
   <File Type="PLACE-TIMING" Name="primitives_timing_summary_placed.rpt"/>
   <File Type="POSTPLACE-PWROPT-DCP" Name="primitives_postplace_pwropt.dcp"/>
-  <File Type="BG-BIN" Name="primitives.bin"/>
+  <File Type="BITSTR-MSK" Name="primitives.msk"/>
   <File Type="POSTPLACE-PWROPT-TIMING" Name="primitives_timing_summary_postplace_pwropted.rpt"/>
   <File Type="PHYSOPT-DCP" Name="primitives_physopt.dcp"/>
   <File Type="PHYSOPT-DRC" Name="primitives_drc_physopted.rpt"/>
-  <File Type="BITSTR-MSK" Name="primitives.msk"/>
+  <File Type="BITSTR-RBT" Name="primitives.rbt"/>
   <File Type="PHYSOPT-TIMING" Name="primitives_timing_summary_physopted.rpt"/>
   <File Type="ROUTE-ERROR-DCP" Name="primitives_routed_error.dcp"/>
   <File Type="ROUTE-DCP" Name="primitives_routed.dcp"/>
@@ -36,7 +37,6 @@
   <File Type="ROUTE-DRC" Name="primitives_drc_routed.rpt"/>
   <File Type="ROUTE-DRC-PB" Name="primitives_drc_routed.pb"/>
   <File Type="ROUTE-DRC-RPX" Name="primitives_drc_routed.rpx"/>
-  <File Type="BITSTR-MMI" Name="primitives.mmi"/>
   <File Type="ROUTE-METHODOLOGY-DRC" Name="primitives_methodology_drc_routed.rpt"/>
   <File Type="ROUTE-METHODOLOGY-DRC-RPX" Name="primitives_methodology_drc_routed.rpx"/>
   <File Type="ROUTE-METHODOLOGY-DRC-PB" Name="primitives_methodology_drc_routed.pb"/>
@@ -57,11 +57,11 @@
   <File Type="POSTROUTE-PHYSOPT-TIMING-PB" Name="primitives_timing_summary_postroute_physopted.pb"/>
   <File Type="POSTROUTE-PHYSOPT-TIMING-RPX" Name="primitives_timing_summary_postroute_physopted.rpx"/>
   <File Type="POSTROUTE-PHYSOPT-BUS-SKEW" Name="primitives_bus_skew_postroute_physopted.rpt"/>
-  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW-PB" Name="primitives_bus_skew_postroute_physopted.pb"/>
   <File Type="BG-BIT" Name="primitives.bit"/>
+  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW-PB" Name="primitives_bus_skew_postroute_physopted.pb"/>
   <File Type="POSTROUTE-PHYSOPT-BUS-SKEW-RPX" Name="primitives_bus_skew_postroute_physopted.rpx"/>
-  <File Type="BITSTR-RBT" Name="primitives.rbt"/>
   <File Type="BITSTR-NKY" Name="primitives.nky"/>
+  <File Type="BITSTR-BMM" Name="primitives_bd.bmm"/>
   <File Type="PDI-FILE" Name="primitives.pdi"/>
   <File Type="RCFI_FILE" Name="primitives.rcfi"/>
   <File Type="CFI_FILE" Name="primitives.cfi"/>
@@ -75,6 +75,10 @@
   <File Type="BG-DRC" Name="primitives.drc"/>
   <File Type="RDI-RDI" Name="primitives.vdi"/>
   <File Type="WBT-USG" Name="usage_statistics_webtalk.html"/>
+  <File Type="ROUTE-RQS" Name="primitives_routed.rqs"/>
+  <File Type="POSTROUTE-PHYSOPT-RQS" Name="primitives_postroute_physopted.rqs"/>
+  <File Type="ROUTE-RQS-RPT" Name="route_report_qor_suggestions_0.rpt"/>
+  <File Type="POSTROUTE-PHYSOPT-RQS-RPT" Name="postroute_physopt_report_qor_suggestions_0.rpt"/>
   <FileSet Name="sources" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1" RelGenDir="$PGENDIR/sources_1">
     <Filter Type="Srcs"/>
     <File Path="$PSRCDIR/sources_1/new/primitives.v">
@@ -110,19 +114,19 @@
     <Filter Type="Constrs"/>
     <File Path="$PSRCDIR/constrs_1/new/a100.xdc">
       <FileInfo>
-        <Attr Name="UserDisabled" Val="1"/>
         <Attr Name="UsedIn" Val="synthesis"/>
         <Attr Name="UsedIn" Val="implementation"/>
       </FileInfo>
     </File>
     <File Path="$PSRCDIR/constrs_1/new/a12.xdc">
       <FileInfo>
+        <Attr Name="UserDisabled" Val="1"/>
         <Attr Name="UsedIn" Val="synthesis"/>
         <Attr Name="UsedIn" Val="implementation"/>
       </FileInfo>
     </File>
     <Config>
-      <Option Name="TargetConstrsFile" Val="$PSRCDIR/constrs_1/new/a12.xdc"/>
+      <Option Name="TargetConstrsFile" Val="$PSRCDIR/constrs_1/new/a100.xdc"/>
       <Option Name="ConstrsType" Val="XDC"/>
     </Config>
   </FileSet>
@@ -146,5 +150,5 @@
     <Step Id="post_route_phys_opt_design"/>
     <Step Id="write_bitstream"/>
   </Strategy>
-  <BlockFileSet Type="BlockSrcs" Name="test_rom"/>
+  <BlockFileSet Type="BlockSrcs" Name="blk_mem_gen_0"/>
 </GenRun>

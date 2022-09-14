@@ -149,15 +149,39 @@ class Bitstream:
         cbs = 'configuration_buses'
         cols = 'configuration_columns'
         numFrames = 0
+        rowCols = []
+        rows = []
+        bt = []
         for key in self.tileDef[gcr]:
             # print(key)
             for row in self.tileDef[gcr][key]['rows']:
                 for cb in self.tileDef[gcr][key]['rows'][row][cbs]:
                     for col in self.tileDef[gcr][key]['rows'][row][cbs][cb][cols]:
                         numFrames += self.tileDef[gcr][key]['rows'][row][cbs][cb][cols][col]['frame_count']
+                        rowCols.append(self.tileDef[gcr][key]['rows'][row][cbs][cb][cols][col]['frame_count'])
+                        
+                rows.append(rowCols)
+                rowCols = []
+            
+            bt.append(rows)
+            rows = []
+        
+        rng = 0
+        gridView = []
+        gridrows = []
+        
+        for _bt in bt:
+            for row in _bt:
+                for col in row:
+                    rowCols.append(frames[rng:rng+col])
+                    rng += col
+                
+                gridrows.append(rowCols)
+                rng += 2
+                rowCols = []
 
-                        if numFrames == 1944:
-                            print('hi')
+            gridView.append(gridrows)
+            gridrows = []
 
         print('hi')
 
@@ -182,10 +206,46 @@ class Bitstream:
 
         return crc
 
+WORD_SIZE_BITS = 32
+def load_bitdata(f):
+    """ Read bit file and return bitdata map.
+    Similar to segbits file
+
+    bitdata is a map of of two sets.
+    The map key is the frame address.
+    The first sets are the word columns that have any bits set.
+    Word columsn are WORD_SIZE_BITS wide.
+    The second sets are bit index within the frame and word if it is set.
+    """
+    bitdata = dict()
+
+    for line in f:
+        line = line.split("_")
+        frame = int(line[1], 16)
+        wordidx = int(line[2], 10)
+        bitidx = int(line[3], 10)
+
+        if frame not in bitdata:
+            bitdata[frame] = set(), set()
+
+        bitdata[frame][0].add(wordidx)
+        bitdata[frame][1].add(wordidx * WORD_SIZE_BITS + bitidx)
+
+    return bitdata
+
+def decipher_frameaddr(addr):
+    bus = (addr >> 23) & 0x7
+    top = (addr >> 22) & 0x1
+    row = (addr >> 17) & 0x1f
+    col = (addr >> 7)  & 0x3ff
+    mnr = (addr >> 0)  & 0x3f
+    
+    return (bus,top,row,col,mnr)
+
 if __name__ == "__main__":
-    multBits = Bitstream("FPGA-RE/Bitstreams/bram_xca100t.bit")
+    multBits = Bitstream("FPGA-RE/Bitstreams/x.bit")
     multBits.parse_bits()
-    multBitsopp = Bitstream("FPGA-RE/Bitstreams/bram_xca100t_opp.bit")
+    multBitsopp = Bitstream("FPGA-RE/Bitstreams/y.bit")
     multBitsopp.parse_bits()
     
     test = np.array(multBits.configBitstream) ^ np.array(multBitsopp.configBitstream)
@@ -195,3 +255,4 @@ if __name__ == "__main__":
     # multBits.load_tile_grid("FPGA-RE/prjxray-db/artix7/xc7a100t/tilegrid.json")
     
     multBits.analyze_configuration()
+    

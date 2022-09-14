@@ -6,6 +6,15 @@ from zlib import crc32
 import enum
 from time import time
 
+def decipher_frameaddr(addr):
+    bus = (addr >> 23) & 0x7
+    top = (addr >> 22) & 0x1
+    row = (addr >> 17) & 0x1f
+    col = (addr >> 7)  & 0x3ff
+    mnr = (addr >> 0)  & 0x3f
+    
+    return (bus,top,row,col,mnr)
+
 class configPacket:
     # just a container for the packets
     def __init__(self,pktType,opcode,addr,data):
@@ -80,15 +89,11 @@ class Bitstream:
         rem = self._raw_bytes[rawBytes.find(syncWord) + 12:]
         configPackets = rem.reshape(-1,4).view(np.uint32).newbyteorder().flatten()
         # hexPackets = [hex(pkt)[2:].zfill(8) for pkt in configPackets]
-
         
         _configPackets = configPackets.tolist()
-        cmdIssued = False
-        configured = False
         self.crcBytes = bytes()
 
         while _configPackets:
-        # for pkt in configPackets:
             pkt = _configPackets.pop(0)
             pktType = pkt >> 29
             
@@ -118,17 +123,8 @@ class Bitstream:
 
                         payload, _configPackets = np.array(_configPackets[0:pld]), _configPackets[pld:]
 
-                    # if cmdIssued and not configured:
-                    #     # self.crcBytes += pkt.to_bytes(4,'big') + np.array(payload,dtype=np.uint32).byteswap().tobytes()
-                    #     self.crcBytes += ((addr << 32) | payload).byteswap().tobytes()
-
                     if pld > 1000:
                         self.configBitstream = np.array(payload)
-                        # configured = True
-
-                    # if addr == configPacket.Address.CMD.value and payload[0] == 0x7:
-                    #     cmdIssued = True
-
                     
                     decodedPackets.append(configPacket(pktType,opcode,addr,payload))
                     
@@ -141,36 +137,47 @@ class Bitstream:
     def analyze_configuration(self):
 
         bits = np.array(self.configBitstream)
-        nonzero = np.count_nonzero(bits)
         frames = bits.reshape(-1,101)
-        whereNonzero = np.where(bits>0)
 
         gcr = 'global_clock_regions'
         cbs = 'configuration_buses'
         cols = 'configuration_columns'
+        clb = 'CLB_IO_CLK'
+        bram = 'BLOCK_RAM'
         numFrames = 0
         rowCols = []
-        rows = []
-        bt = []
+        clbrows = []
+        bramrows = []
+        btCLBs = []
+        btBRAMs = []
+
         for key in self.tileDef[gcr]:
-            # print(key)
             for row in self.tileDef[gcr][key]['rows']:
-                for cb in self.tileDef[gcr][key]['rows'][row][cbs]:
-                    for col in self.tileDef[gcr][key]['rows'][row][cbs][cb][cols]:
-                        numFrames += self.tileDef[gcr][key]['rows'][row][cbs][cb][cols][col]['frame_count']
-                        rowCols.append(self.tileDef[gcr][key]['rows'][row][cbs][cb][cols][col]['frame_count'])
-                        
-                rows.append(rowCols)
+                for col in self.tileDef[gcr][key]['rows'][row][cbs][clb][cols]:
+                    numFrames += self.tileDef[gcr][key]['rows'][row][cbs][clb][cols][col]['frame_count']
+                    rowCols.append(self.tileDef[gcr][key]['rows'][row][cbs][clb][cols][col]['frame_count'])
+                
+                clbrows.append(rowCols)
                 rowCols = []
+                
+                for col in self.tileDef[gcr][key]['rows'][row][cbs][bram][cols]:
+                    numFrames += self.tileDef[gcr][key]['rows'][row][cbs][bram][cols][col]['frame_count']
+                    rowCols.append(self.tileDef[gcr][key]['rows'][row][cbs][bram][cols][col]['frame_count'])
+                        
+                bramrows.append(rowCols)
+                rowCols = []
+
             
-            bt.append(rows)
-            rows = []
-        
+            btCLBs.append(clbrows)
+            btBRAMs.append(bramrows)
+            clbrows = []
+            bramrows = []
+
         rng = 0
         gridView = []
         gridrows = []
         
-        for _bt in bt:
+        for _bt in btCLBs:
             for row in _bt:
                 for col in row:
                     rowCols.append(frames[rng:rng+col])
@@ -183,7 +190,29 @@ class Bitstream:
             gridView.append(gridrows)
             gridrows = []
 
+        alutBits = self.load_segbits('FPGA-RE/prjxray-db/artix7/segbits_clblm_r.db')
+        blk,top,row,col,off = decipher_frameaddr(0x00001b80)
+        offset = 28
+
+        contents = 0
+        for i, (frame, bit) in enumerate(alutBits):
+            # test = int(gridView[top][row][col][frame][28:28+2].view(np.uint64).byteswap()[0])
+            test = np.unpackbits(gridView[top][row][col][frame][28:28+2].view(np.uint8))
+            test1 = gridView[top][row][col][frame][28:28+2]
+            test2 = test1.view(np.uint8)
+            test3 = np.unpackbits(test2)
+            # contents |= ((test & (2**bit)) >> bit) << i
+            contents |= (int(test[bit]) << i)
+
         print('hi')
+
+    def load_segbits(self,filename):
+        cont = open(filename, 'r').read().splitlines()
+
+        splt = [c.split(' ') for c in cont] 
+
+        slicemALUT = [list(map(int, s[-1].split('_'))) for s in splt if 'SLICEM_X0.ALUT.INIT' in s[0]]
+        return slicemALUT
 
     def load_tile_grid(self, filename):
         self.tileDef = json.load(open(filename,'r'))
@@ -233,14 +262,7 @@ def load_bitdata(f):
 
     return bitdata
 
-def decipher_frameaddr(addr):
-    bus = (addr >> 23) & 0x7
-    top = (addr >> 22) & 0x1
-    row = (addr >> 17) & 0x1f
-    col = (addr >> 7)  & 0x3ff
-    mnr = (addr >> 0)  & 0x3f
-    
-    return (bus,top,row,col,mnr)
+
 
 if __name__ == "__main__":
     multBits = Bitstream("FPGA-RE/Bitstreams/x.bit")

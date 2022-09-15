@@ -87,7 +87,7 @@ class Bitstream:
         
         self.header = self._raw_bytes[:rawBytes.find(syncWord)]
         rem = self._raw_bytes[rawBytes.find(syncWord) + 12:]
-        configPackets = rem.reshape(-1,4).view(np.uint32).newbyteorder().flatten()
+        configPackets = rem.reshape(-1,4).view(np.uint32).byteswap().flatten()
         # hexPackets = [hex(pkt)[2:].zfill(8) for pkt in configPackets]
         
         _configPackets = configPackets.tolist()
@@ -104,12 +104,13 @@ class Bitstream:
                 
                 if opcode == configPacket.Opcodes.NOP.value:
                     decodedPackets.append(configPacket(pktType,opcode,addr,[pld]))
+                    
                 elif opcode == 1 or opcode == 2:
                     
 
 
                     if pld > 0:
-                        payload, _configPackets = np.array(_configPackets[0:pld]), _configPackets[pld:]
+                        payload, _configPackets = np.array(_configPackets[0:pld],dtype=np.uint32), _configPackets[pld:]
                     
                     else:
                         t2Pkt = _configPackets.pop(0)
@@ -121,10 +122,10 @@ class Bitstream:
                             pld = t2Pkt & 0x7FFFFFF
                             opcode = (t2Pkt >> 27) & 0x3
 
-                        payload, _configPackets = np.array(_configPackets[0:pld]), _configPackets[pld:]
+                        payload, _configPackets = np.array(_configPackets[0:pld],dtype=np.uint32), _configPackets[pld:]
 
                     if pld > 1000:
-                        self.configBitstream = np.array(payload)
+                        self.configBitstream = payload
                     
                     decodedPackets.append(configPacket(pktType,opcode,addr,payload))
                     
@@ -197,12 +198,16 @@ class Bitstream:
         contents = 0
         for i, (frame, bit) in enumerate(alutBits):
             # test = int(gridView[top][row][col][frame][28:28+2].view(np.uint64).byteswap()[0])
+            vals = gridView[top][row][col][frame][28:28+2]
             test = np.unpackbits(gridView[top][row][col][frame][28:28+2].view(np.uint8))
             test1 = gridView[top][row][col][frame][28:28+2]
             test2 = test1.view(np.uint8)
             test3 = np.unpackbits(test2)
             # contents |= ((test & (2**bit)) >> bit) << i
-            contents |= (int(test[bit]) << i)
+            contents |= (int(test3[bit]) << i)
+            
+            # x = int.from_bytes(test1.tobytes(),'little')
+            # contents |= ((x & 2**bit) >> bit) << i
 
         print('hi')
 

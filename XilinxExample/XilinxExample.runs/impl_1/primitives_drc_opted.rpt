@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2022.1 (win64) Build 3526262 Mon Apr 18 15:48:16 MDT 2022
-| Date         : Mon Sep 12 21:14:11 2022
+| Date         : Thu Sep 15 11:52:50 2022
 | Host         : DESKTOP-66PI62R running 64-bit major release  (build 9200)
 | Command      : report_drc -file primitives_drc_opted.rpt -pb primitives_drc_opted.pb -rpx primitives_drc_opted.rpx
 | Design       : primitives
@@ -24,14 +24,15 @@ Table of Contents
       Design limits: <entire design considered>
            Ruledeck: default
              Max violations: <unlimited>
-             Violations found: 3
-+----------+------------------+-----------------------------------------------------+------------+
-| Rule     | Severity         | Description                                         | Violations |
-+----------+------------------+-----------------------------------------------------+------------+
-| UCIO-1   | Critical Warning | Unconstrained Logical Port                          | 1          |
-| CFGBVS-1 | Warning          | Missing CFGBVS and CONFIG_VOLTAGE Design Properties | 1          |
-| PLIO-3   | Warning          | Placement Constraints Check for IO constraints      | 1          |
-+----------+------------------+-----------------------------------------------------+------------+
+             Violations found: 8
++-----------+------------------+-----------------------------------------------------+------------+
+| Rule      | Severity         | Description                                         | Violations |
++-----------+------------------+-----------------------------------------------------+------------+
+| UCIO-1    | Critical Warning | Unconstrained Logical Port                          | 1          |
+| CFGBVS-1  | Warning          | Missing CFGBVS and CONFIG_VOLTAGE Design Properties | 1          |
+| PDCN-1569 | Warning          | LUT equation term check                             | 5          |
+| PLIO-3    | Warning          | Placement Constraints Check for IO constraints      | 1          |
++-----------+------------------+-----------------------------------------------------+------------+
 
 2. REPORT DETAILS
 -----------------
@@ -51,6 +52,31 @@ Neither the CFGBVS nor CONFIG_VOLTAGE voltage property is set in the current_des
  #where value2 is the voltage provided to configuration bank 0
 
 Refer to the device configuration user guide for more information.
+Related violations: <none>
+
+PDCN-1569#1 Warning
+LUT equation term check  
+Used physical LUT pin 'A1' of cell U4 (pin U4/I0) is not included in the LUT equation: 'O6=(A6)'. If this cell is a user instantiated LUT in the design, please remove connectivity to the pin or change the equation and/or INIT string of the LUT to prevent this issue. If the cell is inferred or IP created LUT, please regenerate the IP and/or resynthesize the design to attempt to correct the issue.
+Related violations: <none>
+
+PDCN-1569#2 Warning
+LUT equation term check  
+Used physical LUT pin 'A2' of cell U4 (pin U4/I1) is not included in the LUT equation: 'O6=(A6)'. If this cell is a user instantiated LUT in the design, please remove connectivity to the pin or change the equation and/or INIT string of the LUT to prevent this issue. If the cell is inferred or IP created LUT, please regenerate the IP and/or resynthesize the design to attempt to correct the issue.
+Related violations: <none>
+
+PDCN-1569#3 Warning
+LUT equation term check  
+Used physical LUT pin 'A3' of cell U4 (pin U4/I2) is not included in the LUT equation: 'O6=(A6)'. If this cell is a user instantiated LUT in the design, please remove connectivity to the pin or change the equation and/or INIT string of the LUT to prevent this issue. If the cell is inferred or IP created LUT, please regenerate the IP and/or resynthesize the design to attempt to correct the issue.
+Related violations: <none>
+
+PDCN-1569#4 Warning
+LUT equation term check  
+Used physical LUT pin 'A4' of cell U4 (pin U4/I3) is not included in the LUT equation: 'O6=(A6)'. If this cell is a user instantiated LUT in the design, please remove connectivity to the pin or change the equation and/or INIT string of the LUT to prevent this issue. If the cell is inferred or IP created LUT, please regenerate the IP and/or resynthesize the design to attempt to correct the issue.
+Related violations: <none>
+
+PDCN-1569#5 Warning
+LUT equation term check  
+Used physical LUT pin 'A5' of cell U4 (pin U4/I4) is not included in the LUT equation: 'O6=(A6)'. If this cell is a user instantiated LUT in the design, please remove connectivity to the pin or change the equation and/or INIT string of the LUT to prevent this issue. If the cell is inferred or IP created LUT, please regenerate the IP and/or resynthesize the design to attempt to correct the issue.
 Related violations: <none>
 
 PLIO-3#1 Warning

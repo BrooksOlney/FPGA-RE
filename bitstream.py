@@ -106,8 +106,6 @@ class Bitstream:
                     decodedPackets.append(configPacket(pktType,opcode,addr,[pld]))
                     
                 elif opcode == 1 or opcode == 2:
-                    
-
 
                     if pld > 0:
                         payload, _configPackets = np.array(_configPackets[0:pld],dtype=np.uint32), _configPackets[pld:]
@@ -190,26 +188,39 @@ class Bitstream:
 
             gridView.append(gridrows)
             gridrows = []
+        
+
+        bramgridView = []
+        for _bt in btBRAMs:
+            for row in _bt:
+                for col in row:
+                    rowCols.append(frames[rng:rng+col])
+                    rng += col
+                
+                gridrows.append(rowCols)
+                rng += 2
+                rowCols = []
+
+            bramgridView.append(gridrows)
+            gridrows = []
 
         alutBits = self.load_segbits('FPGA-RE/prjxray-db/artix7/segbits_clblm_r.db')
         blk,top,row,col,off = decipher_frameaddr(0x00001b80)
         offset = 28
 
         contents = 0
+        contents = [0] * 64
         for i, (frame, bit) in enumerate(alutBits):
-            # test = int(gridView[top][row][col][frame][28:28+2].view(np.uint64).byteswap()[0])
-            vals = gridView[top][row][col][frame][28:28+2]
-            test = np.unpackbits(gridView[top][row][col][frame][28:28+2].view(np.uint8))
-            test1 = gridView[top][row][col][frame][28:28+2]
-            test2 = test1.view(np.uint8)
-            test3 = np.unpackbits(test2)
+            vals = gridView[top][row][col][frame][offset:offset+2]
+            rawBits = np.unpackbits(np.frombuffer(vals.tobytes(),dtype=np.uint8))
             # contents |= ((test & (2**bit)) >> bit) << i
-            contents |= (int(test3[bit]) << i)
-            
-            # x = int.from_bytes(test1.tobytes(),'little')
+            # contents |= (int(test3[bit]) << i)
+            # x = int.from_bytes(vals.tobytes(),'little')
             # contents |= ((x & 2**bit) >> bit) << i
+            contents[i] = rawBits[bit]
 
-        print('hi')
+        contents= np.packbits(contents).view(np.uint64)[0]
+        print('')
 
     def load_segbits(self,filename):
         cont = open(filename, 'r').read().splitlines()

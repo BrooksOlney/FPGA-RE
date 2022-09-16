@@ -5,6 +5,7 @@ import numpy as np
 from zlib import crc32
 import enum
 from time import time
+from bels import BRAM18
 
 def decipher_frameaddr(addr):
     bus = (addr >> 23) & 0x7
@@ -204,6 +205,9 @@ class Bitstream:
             bramgridView.append(gridrows)
             gridrows = []
 
+        self.CLBgrid = gridView
+        self.BRAMgrid = bramgridView
+
         alutBits = self.load_segbits('FPGA-RE/prjxray-db/artix7/segbits_clblm_r.db')
         blk,top,row,col,off = decipher_frameaddr(0x00001b80)
         offset = 28
@@ -212,7 +216,7 @@ class Bitstream:
         contents = [0] * 64
         for i, (frame, bit) in enumerate(alutBits):
             vals = gridView[top][row][col][frame][offset:offset+2]
-            rawBits = np.unpackbits(np.frombuffer(vals.tobytes(),dtype=np.uint8))
+            rawBits = np.unpackbits(vals.view(np.uint8))
             # contents |= ((test & (2**bit)) >> bit) << i
             # contents |= (int(test3[bit]) << i)
             # x = int.from_bytes(vals.tobytes(),'little')
@@ -221,6 +225,17 @@ class Bitstream:
 
         contents= np.packbits(contents).view(np.uint64)[0]
         print('')
+
+    def load_bram_tiles(self,filename):
+        
+        BRAMs = []
+    
+        with open(filename,'r') as tfile:
+            tilegrid = json.load(tfile)
+            for bram in [i for i in tilegrid.keys() if 'BRAM_L' in i or "BRAM_R" in i]:
+                BRAMs.append(BRAM18(tilegrid[bram]))
+
+        self.BRAMs = BRAMs
 
     def load_segbits(self,filename):
         cont = open(filename, 'r').read().splitlines()
@@ -293,4 +308,5 @@ if __name__ == "__main__":
     # multBits.load_tile_grid("FPGA-RE/prjxray-db/artix7/xc7a100t/tilegrid.json")
     
     multBits.analyze_configuration()
-    
+    multBits.load_bram_tiles('FPGA-RE/prjxray-db/artix7/xc7a100t/tilegrid.json')
+    print('hi')

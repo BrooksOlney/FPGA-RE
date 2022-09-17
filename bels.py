@@ -8,17 +8,17 @@ class FrameInfo:
         self.offset   = jsonData['offset']
         self.words    = jsonData['words']
     
-    def decipher_frameaddr(addr):
-        bus = (addr >> 23) & 0x7
-        top = (addr >> 22) & 0x1
-        row = (addr >> 17) & 0x1f
-        col = (addr >> 7)  & 0x3ff
-        mnr = (addr >> 0)  & 0x3f
+    def decipher_frameaddr(self):
+        bus = (self.baseAddr >> 23) & 0x7
+        top = (self.baseAddr >> 22) & 0x1
+        row = (self.baseAddr >> 17) & 0x1f
+        col = (self.baseAddr >> 7)  & 0x3ff
+        mnr = (self.baseAddr >> 0)  & 0x3f
     
         return (bus,top,row,col,mnr)
 
 class BRAM18:
-    INIT = None
+    INITLocs = None
 
     def __init__(self,jsonData):
         self.x = jsonData['grid_x']
@@ -28,14 +28,14 @@ class BRAM18:
         self.bramFrameData = FrameInfo(bitsData['BLOCK_RAM'])
         self.clbioFramData = FrameInfo(bitsData['CLB_IO_CLK'])
 
-        if self.INIT is None:
-            # self.INIT = np.zeros(dtype=np.uint8, shape=(0x3F,256))
-            # self.INITLocs = np.zeros(dtype=np.uint16, shape=(0x3F,256,2))
+        self.INIT = np.zeros(dtype=np.uint8, shape=(64,256))
+        self.INITP = np.zeros(dtype=np.uint8, shape=(0x8,256))
 
-            # self.INITP = np.zeros(dtype=np.uint8, shape=(0x8,256))
-            # self.INITPLocs = np.zeros(dtype=np.uint16, shape=(0x8,256))
-
+        if self.INITLocs is None:
             self.parse_segbits()
+
+    def __repr__(self):
+        return f'BRAM({hex(self.bramFrameData.baseAddr)} - {self.bramFrameData.decipher_frameaddr()})'
 
     @classmethod
     def parse_segbits(cls):
@@ -52,16 +52,31 @@ class BRAM18:
         bramConfigSplt = [re.split(r'\s*[\[\]]\s*|[_]|[.]', line) for line in bramConfig]
         bramCLBSplt    = [re.split(r'\s*[\[\]]\s*|[_]|[.]', line) for line in bramCLB]
 
-        cls.INIT = np.zeros(dtype=np.uint8, shape=(0x3F,256))
-        cls.INITLocs = np.zeros(dtype=np.uint16, shape=(0x3F,256,2))
+        cls.INITLocs = np.zeros(dtype=np.uint16, shape=(64,256,2))
 
-        cls.INITP = np.zeros(dtype=np.uint8, shape=(0x8,256))
-        cls.INITPLocs = np.zeros(dtype=np.uint16, shape=(0x8,256))
+        cls.INITPLocs = np.zeros(dtype=np.uint16, shape=(0x8,256,2))
 
         for line in bramConfigSplt:
-            if 'INIT_' in line:
-                cls.INITLocs[line[-4],line[-3],0] = line[-2]
-                cls.INITLocs[line[-4],line[-3],1] = line[-1]
-            elif 'INITP_' in line:
-                cls.INITPLocs[line[-4],line[-3],0] = line[-2]
-                cls.INITPLocs[line[-4],line[-3],1] = line[-1]
+            blk = int(line[-4],16)
+            initBit,frame,bit = [int(i) for i in line[-3:]]
+
+            if 'INIT' in line:
+                cls.INITLocs[blk,initBit,0] = frame
+                cls.INITLocs[blk,initBit,1] = bit
+            elif 'INITP' in line:
+                cls.INITPLocs[blk,initBit,0] = frame
+                cls.INITPLocs[blk,initBit,1] = bit
+
+    def extract_from_tiles(self,tiles):
+        _,top,row,col,mnr = self.bramFrameData.decipher_frameaddr()
+        offset, words = self.bramFrameData.offset, self.bramFrameData.words
+
+        toUnpack = tiles[top][row][col][:,offset:offset+words]
+
+        unpacked = np.unpackbits(toUnpack.view(np.uint8),axis=1)
+
+        for i in range(64):
+            self.INIT[i] = unpacked[self.INITLocs[i,:,0],self.INITLocs[i,:,1]]
+
+        for i in range(8):
+            self.INITP[i] = unpacked[self.INITPLocs[i,:,0],self.INITPLocs[i,:,1]]

@@ -229,7 +229,7 @@ class Bitstream:
         self.BRAMs = BRAMs
 
         for BRAM in self.BRAMs:
-            BRAM.extractFromTiles(self.BRAMgrid)
+            BRAM.extract_from_tiles(self.BRAMgrid)
 
 
     def load_segbits(self,filename):

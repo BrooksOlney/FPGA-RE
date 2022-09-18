@@ -5,7 +5,7 @@ import numpy as np
 from zlib import crc32
 import enum
 from time import time
-from bels import BRAM18
+from bels import BRAM36
 
 class configPacket:
     # just a container for the packets
@@ -224,12 +224,12 @@ class Bitstream:
         with open(filename,'r') as tfile:
             tilegrid = json.load(tfile)
             for bram in [i for i in tilegrid.keys() if 'BRAM_L' in i or "BRAM_R" in i]:
-                BRAMs.append(BRAM18(tilegrid[bram]))
+                BRAMs.append(BRAM36(tilegrid[bram]))
 
         self.BRAMs = BRAMs
 
         for BRAM in self.BRAMs:
-            BRAM.extract_from_tiles(self.BRAMgrid)
+            BRAM.extract_from_tiles(self.BRAMgrid,self.CLBgrid)
 
 
     def load_segbits(self,filename):
@@ -291,12 +291,13 @@ def load_bitdata(f):
 
 
 if __name__ == "__main__":
+    s = time()
     multBits = Bitstream("FPGA-RE/Bitstreams/x.bit")
     multBits.parse_bits()
-    multBitsopp = Bitstream("FPGA-RE/Bitstreams/y.bit")
-    multBitsopp.parse_bits()
+    # multBitsopp = Bitstream("FPGA-RE/Bitstreams/y.bit")
+    # multBitsopp.parse_bits()
     
-    test = np.array(multBits.configBitstream) ^ np.array(multBitsopp.configBitstream)
+    # test = np.array(multBits.configBitstream) ^ np.array(multBitsopp.configBitstream)
     # multBits.analyze_configuration()
 
     multBits.load_tile_grid("FPGA-RE/prjxray-db/artix7/xc7a100tftg256-2/part.json")
@@ -304,4 +305,5 @@ if __name__ == "__main__":
     
     multBits.analyze_configuration()
     multBits.load_bram_tiles('FPGA-RE/prjxray-db/artix7/xc7a100t/tilegrid.json')
+    e = time() - s
     print('hi')

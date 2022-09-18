@@ -35,7 +35,7 @@ class BRAM18:
             self.parse_segbits()
 
     def __repr__(self):
-        return f'BRAM({hex(self.bramFrameData.baseAddr)} - {self.bramFrameData.decipher_frameaddr()})'
+        return f'BRAM({hex(self.bramFrameData.baseAddr)},{(self.x,self.y)})'
 
     @classmethod
     def parse_segbits(cls):

@@ -25,8 +25,8 @@ class BRAM36:
         self.y = jsonData['grid_y']
 
         bitsData = jsonData['bits']
-        self.bramFrameData = FrameInfo(bitsData['BLOCK_RAM'])
-        self.clbioFramData = FrameInfo(bitsData['CLB_IO_CLK'])
+        self.bramFrameData  = FrameInfo(bitsData['BLOCK_RAM'])
+        self.clbioFrameData = FrameInfo(bitsData['CLB_IO_CLK'])
 
         self.INIT = np.zeros(dtype=np.uint8, shape=(2,64,256))
         self.INITP = np.zeros(dtype=np.uint8, shape=(2,0x8,256))
@@ -49,11 +49,10 @@ class BRAM36:
         with open(loc+clbio_file,'r') as clbfile:
             bramCLB = clbfile.read().splitlines()
 
-        bramConfigSplt = [re.split(r'\s*[\[\]]\s*|[_]|[.]', line) for line in bramConfig]
-        bramCLBSplt    = [re.split(r'\s*[\[\]]\s*|[_]|[.]', line) for line in bramCLB]
+        bramConfigSplt = [re.split(r'\s*[\[\]]\s*|[_]|[.]|[ ]', line) for line in bramConfig]
+        bramCLBSplt    = [re.split(r'\s*[\[\]]\s*|[_]|[.]|[ ]', line) for line in bramCLB]
 
         cls.INITLocs = np.zeros(dtype=np.uint16, shape=(2,64,256,2))
-
         cls.INITPLocs = np.zeros(dtype=np.uint16, shape=(2,0x8,256,2))
 
         for line in bramConfigSplt:
@@ -68,10 +67,21 @@ class BRAM36:
                 cls.INITPLocs[y,blk,initBit,0] = frame
                 cls.INITPLocs[y,blk,initBit,1] = bit
 
+        bramConfigs = {}
+        ramb18configs = [{},{}]
+        for line in bramCLBSplt:
+            if "RAMB18" in line[2]:
+                idx = int(line[3][1])
+                ramb18configs[idx][''.join(line[5:6])] = line[7:]
+
+        print('a')
+
+
+
     def extract_from_tiles(self,BRAMtiles,CLBtiles):
         _,top,row,col,mnr = self.bramFrameData.decipher_frameaddr()
         offset, words = self.bramFrameData.offset, self.bramFrameData.words
-        clbDims = self.clbioFramData.decipher_frameaddr()
+        clbDims = self.clbioFrameData.decipher_frameaddr()
         toUnpack = np.ascontiguousarray(BRAMtiles[top][row][col][:,offset:offset+words])
 
         unpacked = np.unpackbits(toUnpack.view(np.uint8),axis=1)
@@ -81,3 +91,5 @@ class BRAM36:
 
         for i in range(8):
             self.INITP[:,i] = unpacked[self.INITPLocs[:,i,:,0],self.INITPLocs[:,i,:,1]]
+
+        

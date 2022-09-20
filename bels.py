@@ -68,8 +68,8 @@ class BRAM36:
                 cls.INITPLocs[y,blk,initBit,0] = frame
                 cls.INITPLocs[y,blk,initBit,1] = bit
 
-        bramConfigs = {}
-        ramb18configs = [{},{}]
+        # bramConfigs = {}
+        # ramb18configs = [{},{}]
         configs = []
         for line in bramCLBSplt:
             # if "RAMB18" in line[2]:
@@ -88,16 +88,12 @@ class BRAM36:
                 numeric.append(tuple(map(int,net.replace('!','').split('_'))))
                     
             configs.append((line[0], numeric, truth))            
-                
-                
-        print('a')
-
-
+        
+        cls.configs = configs
 
     def extract_from_tiles(self,BRAMtiles,CLBtiles):
         _,top,row,col,mnr = self.bramFrameData.decipher_frameaddr()
         offset, words = self.bramFrameData.offset, self.bramFrameData.words
-        clbDims = self.clbioFrameData.decipher_frameaddr()
         toUnpack = np.ascontiguousarray(BRAMtiles[top][row][col][:,offset:offset+words])
 
         unpacked = np.unpackbits(toUnpack.view(np.uint8),axis=1,bitorder='little')
@@ -108,4 +104,13 @@ class BRAM36:
         for i in range(8):
             self.INITP[:,i] = unpacked[self.INITPLocs[:,i,:,0],self.INITPLocs[:,i,:,1]]
 
-        
+        clbDims = self.clbioFrameData.decipher_frameaddr()
+        offset, words = self.bramFrameData.offset, self.bramFrameData.words
+        clbUnpack = np.ascontiguousarray(np.array(CLBtiles)[clbDims[1]][clbDims[2]][clbDims[3]][:,offset:offset+words])
+        clbUnpacked = np.unpackbits(clbUnpack.view(np.uint8),axis=1,bitorder='little')
+
+        vals = []
+        for c in self.configs:
+            vals.append(clbUnpacked[np.array(c[1])[:,0],np.array(c[1])[:,1]])
+
+        print('')

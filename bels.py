@@ -17,6 +17,40 @@ class FrameInfo:
     
         return (bus,top,row,col,mnr)
 
+class RAMB18:
+    def __init__(self):
+        self.DOA_REG = 0
+        self.DOB_REG = 0
+        self.FIFO_MODE = 0
+        self.IN_USE = 0
+        self.DELAYED_WRITE_PERF = 0
+        self.READ_WIDTH_A = 0
+        self.READ_WIDTH_B = 0
+        self.RSTREG_PRIORITY_A = 0
+        self.RSTREG_PRIORITY_B = 0
+        self.SDP_READ_WIDTH = 0
+        self.SDP_WRITE_WIDTH = 0
+        self.WRITE_MODE_A_NO_CHANGE = 0
+        self.WRITE_MODE_A_READ_FIRST = 0
+        self.WRITE_MODE_B_NO_CHANGE = 0
+        self.WRITE_MODE_B_READ_FIRST = 0
+        self.WRITE_WIDTH_A = 0
+        self.WRITE_WIDTH_B = 0
+        self.ZINIT_A = np.zeros(18,np.uint8)
+        self.ZINIT_B = np.zeros(18,np.uint8)
+        self.ZINV_CLKARDCLK = 0
+        self.ZINV_CLKBWRCLK = 0
+        self.ZINV_ENARDEN = 0
+        self.ZINV_ENBWREN = 0
+        self.ZINV_REGCLKARDRCLK = 0
+        self.ZINV_REGCLKB = 0
+        self.ZINV_RSTRAMARSTRAM = 0
+        self.ZINV_RSTRAMB = 0
+        self.ZINV_RSTREGARSTREG = 0
+        self.ZINV_RSTREGB = 0
+        self.ZSRVAL_A = np.zeros(18,np.uint8)
+        self.ZSRVAL_B = np.zeros(18,np.uint8)
+
 class BRAM36:
     INITLocs = None
 
@@ -30,6 +64,8 @@ class BRAM36:
 
         self.INIT = np.zeros(dtype=np.uint8, shape=(2,64,256))
         self.INITP = np.zeros(dtype=np.uint8, shape=(2,0x8,256))
+
+        self.RAMB18s = [RAMB18(),RAMB18()]
 
         if self.INITLocs is None:
             self.parse_segbits()
@@ -68,8 +104,8 @@ class BRAM36:
                 cls.INITPLocs[y,blk,initBit,0] = frame
                 cls.INITPLocs[y,blk,initBit,1] = bit
 
-        # bramConfigs = {}
-        # ramb18configs = [{},{}]
+        bramConfigs = {}
+        ramb18configs = [{},{}]
         configs = []
         for line in bramCLBSplt:
             # if "RAMB18" in line[2]:
@@ -113,4 +149,5 @@ class BRAM36:
         for c in self.configs:
             vals.append(clbUnpacked[np.array(c[1])[:,0],np.array(c[1])[:,1]])
 
-        print('')
+        if np.max(self.INIT) > 0:
+            print('')

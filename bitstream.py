@@ -200,22 +200,22 @@ class Bitstream:
         self.BRAMgrid = bramgridView
 
         alutBits = self.load_segbits('FPGA-RE/prjxray-db/artix7/segbits_clblm_r.db')
-        # blk,top,row,col,off = decipher_frameaddr(0x00001b80)
-        # offset = 28
+        blk,top,row,col,off = decipher_frameaddr(0x00001b80)
+        offset = 28
 
-        # contents = 0
-        # contents = [0] * 64
-        # for i, (frame, bit) in enumerate(alutBits):
-        #     vals = gridView[top][row][col][frame][offset:offset+2]
-        #     rawBits = np.unpackbits(vals.view(np.uint8))
-        #     # contents |= ((test & (2**bit)) >> bit) << i
-        #     # contents |= (int(test3[bit]) << i)
-        #     # x = int.from_bytes(vals.tobytes(),'little')
-        #     # contents |= ((x & 2**bit) >> bit) << i
-        #     contents[i] = rawBits[bit]
+        contents = 0
+        contents = [0] * 64
+        for i, (frame, bit) in enumerate(alutBits):
+            vals = gridView[top][row][col][frame][offset:offset+2]
+            rawBits = np.unpackbits(vals.view(np.uint8),bitorder='little')
+            # contents |= ((test & (2**bit)) >> bit) << i
+            # contents |= (int(test3[bit]) << i)
+            # x = int.from_bytes(vals.tobytes(),'little')
+            # contents |= ((x & 2**bit) >> bit) << i
+            contents[i] = rawBits[bit]
 
-        # contents= np.packbits(contents).view(np.uint64)[0]
-        # print('')
+        contents= np.packbits(contents,bitorder='little').view(np.uint64)[0]
+        print('')
 
     def load_bram_tiles(self,filename):
         
@@ -260,6 +260,15 @@ class Bitstream:
                     crc >>= 1
 
         return crc
+
+def decipher_frameaddr(baseAddr):
+    bus = (baseAddr >> 23) & 0x7
+    top = (baseAddr >> 22) & 0x1
+    row = (baseAddr >> 17) & 0x1f
+    col = (baseAddr >> 7)  & 0x3ff
+    mnr = (baseAddr >> 0)  & 0x3f
+
+    return (bus,top,row,col,mnr)
 
 WORD_SIZE_BITS = 32
 def load_bitdata(f):

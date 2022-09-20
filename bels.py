@@ -50,7 +50,8 @@ class BRAM36:
             bramCLB = clbfile.read().splitlines()
 
         bramConfigSplt = [re.split(r'\s*[\[\]]\s*|[_]|[.]|[ ]', line) for line in bramConfig]
-        bramCLBSplt    = [re.split(r'\s*[\[\]]\s*|[_]|[.]|[ ]', line) for line in bramCLB]
+        # bramCLBSplt    = [re.split(r'\s*[\[\]]\s*|[_]|[.]|[ ]', line) for line in bramCLB]
+        bramCLBSplt    = [re.split(r'[ ]', line) for line in bramCLB]
 
         cls.INITLocs = np.zeros(dtype=np.uint16, shape=(2,64,256,2))
         cls.INITPLocs = np.zeros(dtype=np.uint16, shape=(2,0x8,256,2))
@@ -69,11 +70,26 @@ class BRAM36:
 
         bramConfigs = {}
         ramb18configs = [{},{}]
+        configs = []
         for line in bramCLBSplt:
-            if "RAMB18" in line[2]:
-                idx = int(line[3][1])
-                ramb18configs[idx][''.join(line[5:6])] = line[7:]
-
+            # if "RAMB18" in line[2]:
+                # idx = int(line[3][1])
+                # ramb18configs[idx][''.join(line[5:6])] = line[7:]
+            nets = line[1:]
+            numeric = []
+            truth = []
+            
+            for net in nets:
+                if "!" in net:
+                    truth.append(False)
+                else:
+                    truth.append(True)
+                    
+                numeric.append(tuple(map(int,net.replace('!','').split('_'))))
+                    
+            configs.append((line[0], numeric, truth))            
+                
+                
         print('a')
 
 
@@ -84,7 +100,7 @@ class BRAM36:
         clbDims = self.clbioFrameData.decipher_frameaddr()
         toUnpack = np.ascontiguousarray(BRAMtiles[top][row][col][:,offset:offset+words])
 
-        unpacked = np.unpackbits(toUnpack.view(np.uint8),axis=1)
+        unpacked = np.unpackbits(toUnpack.view(np.uint8),axis=1,bitorder='little')
 
         for i in range(64):
             self.INIT[:,i] = unpacked[self.INITLocs[:,i,:,0],self.INITLocs[:,i,:,1]]

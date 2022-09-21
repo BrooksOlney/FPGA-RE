@@ -23,7 +23,8 @@ class RAMB18:
         self.DOB_REG = 0
         self.FIFO_MODE = 0
         self.IN_USE = 0
-        self.DELAYED_WRITE_PERF = 0
+        self.RDADDR_COLLISION_HWCONFIG_DELAYED_WRITE = 0
+        self.RDADDR_COLLISION_HWCONFIG_PERFORMANCE = 0
         self.READ_WIDTH_A = 0
         self.READ_WIDTH_B = 0
         self.RSTREG_PRIORITY_A = 0
@@ -66,6 +67,13 @@ class BRAM36:
         self.INITP = np.zeros(dtype=np.uint8, shape=(2,0x8,256))
 
         self.RAMB18s = [RAMB18(),RAMB18()]
+
+        self.CASCOUT_ARD_ACTIVE = 0
+        self.CASCOUT_BWR_ACTIVE = 0
+        self.EN_SYN = 0
+        self.FIRST_WORD_FALL_THROUGH = 0
+        self.ZALMOST_EMPTY_OFFSET = np.zeros(13,np.uint8)
+        self.ZALMOST_FULL_OFFSET = np.zeros(13,np.uint8)
 
         if self.INITLocs is None:
             self.parse_segbits()

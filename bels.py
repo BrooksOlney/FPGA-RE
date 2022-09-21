@@ -68,6 +68,11 @@ class BRAM36:
 
         self.RAMB18s = [RAMB18(),RAMB18()]
 
+        self.ADDRARDADDRL = np.zeros(15,np.uint8)
+        self.ADDRARDADDRU = np.zeros(15,np.uint8)
+        self.ADDRBWRADDRL = np.zeros(15,np.uint8)
+        self.ADDRBWRADDRU = np.zeros(15,np.uint8)
+
         self.CASCOUT_ARD_ACTIVE = 0
         self.CASCOUT_BWR_ACTIVE = 0
         self.EN_SYN = 0

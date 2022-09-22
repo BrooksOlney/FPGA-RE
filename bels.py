@@ -66,8 +66,10 @@ class BRAM36:
         self.INIT = np.zeros(dtype=np.uint8, shape=(2,64,256))
         self.INITP = np.zeros(dtype=np.uint8, shape=(2,0x8,256))
 
+        # to separate attributes of each RAMB18
         self.RAMB18s = [RAMB18(),RAMB18()]
-
+        
+        # BRAM/RAMB36 attributes
         self.ADDRARDADDRL = np.zeros(15,np.uint8)
         self.ADDRARDADDRU = np.zeros(15,np.uint8)
         self.ADDRBWRADDRL = np.zeros(15,np.uint8)
@@ -79,6 +81,17 @@ class BRAM36:
         self.FIRST_WORD_FALL_THROUGH = 0
         self.ZALMOST_EMPTY_OFFSET = np.zeros(13,np.uint8)
         self.ZALMOST_FULL_OFFSET = np.zeros(13,np.uint8)
+
+        self.EN_ECC_READ = 0
+        self.EN_ECC_WRITE = 0
+        self.RAM_EXTENSION_A_LOWER = 0
+        self.RAM_EXTENSION_A_NONE_OR_UPPER = 0
+        self.RAM_EXTENSION_B_LOWER = 0
+        self.RAM_EXTENSION_B_NONE_OR_UPPER = 0
+        self.BRAM36_READ_WIDTH_A_1 = 0
+        self.BRAM36_READ_WIDTH_B_1 = 0
+        self.BRAM36_WRITE_WIDTH_A_1 = 0
+        self.BRAM36_WRITE_WIDTH_B_1 = 0
 
         if self.INITLocs is None:
             self.parse_segbits()
@@ -100,7 +113,7 @@ class BRAM36:
 
         bramConfigSplt = [re.split(r'\s*[\[\]]\s*|[_]|[.]|[ ]', line) for line in bramConfig]
         # bramCLBSplt    = [re.split(r'\s*[\[\]]\s*|[_]|[.]|[ ]', line) for line in bramCLB]
-        bramCLBSplt    = [re.split(r'[ ]', line) for line in bramCLB]
+        bramCLBSplt    = [re.split(r'[ ]|[.]', line) for line in bramCLB]
 
         cls.INITLocs = np.zeros(dtype=np.uint16, shape=(2,64,256,2))
         cls.INITPLocs = np.zeros(dtype=np.uint16, shape=(2,0x8,256,2))
@@ -117,27 +130,58 @@ class BRAM36:
                 cls.INITPLocs[y,blk,initBit,0] = frame
                 cls.INITPLocs[y,blk,initBit,1] = bit
 
-        bramConfigs = {}
-        ramb18configs = [{},{}]
-        configs = []
+        ramb18config = {}
+        for key,val in vars(RAMB18()).items():
+            if type(val) == np.ndarray:
+                _val = np.zeros(shape=(*val.shape,2),dtype=np.uint16)
+                ramb18config[key] = _val
+            # else:
+            #     ramb18config[key] = val
+                
+        ramb18configs = [ramb18config, ramb18config]
+        configs = {}
+        
         for line in bramCLBSplt:
-            # if "RAMB18" in line[2]:
-                # idx = int(line[3][1])
-                # ramb18configs[idx][''.join(line[5:6])] = line[7:]
-            nets = line[1:]
             numeric = []
             truth = []
-            
-            for net in nets:
-                if "!" in net:
-                    truth.append(False)
+            if "RAMB18" in line[1]:
+                rambidx = int(line[1][-1])
+                nets = line[3:]
+                
+                for net in nets:
+                    if "!" in net:
+                        truth.append(False)
+                    else:
+                        truth.append(True)
+                        
+                    numeric.append(tuple(map(int,net.replace('!','').split('_'))))
+                        
+                if '[' in line[2]:
+                    splt = re.split(r'[\[\]]',line[2])
+                    netidx = int(splt[-2])
+                    ramb18configs[rambidx][splt[0]][netidx] = numeric[0]
                 else:
-                    truth.append(True)
+                    ramb18configs[rambidx][line[2]] = (numeric,truth)
+            
+            elif "BRAM" in line[1] or "RAMB36" in line[1]:
+                key = line[2]
+                nets = line[3:]
+                
+                for net in nets:
+                    if "!" in net:
+                        truth.append(False)
+                    else:
+                        truth.append(True)
+                        
+                    numeric.append(tuple(map(int,net.replace('!','').split('_'))))
+            
+                configs[key] = (numeric,truth)
                     
-                numeric.append(tuple(map(int,net.replace('!','').split('_'))))
-                    
-            configs.append((line[0], numeric, truth))            
-        
+            else:
+                key = line[1]
+                configs[line[1]] = ([tuple(map(int, line[-1].split('_')))],None)
+
+        cls.bramConfigs = ramb18configs
         cls.configs = configs
 
     def extract_from_tiles(self,BRAMtiles,CLBtiles):
@@ -159,8 +203,20 @@ class BRAM36:
         clbUnpacked = np.unpackbits(clbUnpack.view(np.uint8),axis=1,bitorder='little')
 
         vals = []
-        for c in self.configs:
-            vals.append(clbUnpacked[np.array(c[1])[:,0],np.array(c[1])[:,1]])
+        configs = {}
+        for config,val in self.configs.items():
+            inds = np.array(val[0])
+            # vals.append(clbUnpacked[])
+            configs[config] = clbUnpacked[inds[:,0],inds[:,1]]
+        
+        bramConfigs = [{},{}]
+        for i,bram in enumerate(self.bramConfigs):
+            for config,val in bram.items():
+                if type(val) == np.ndarray:
+                    inds = val
+                else:
+                    inds = np.array(val[0])
+                bramConfigs[i][config] = clbUnpacked[inds[:,0],inds[:,1]]
 
         if np.max(self.INIT) > 0:
             print('')

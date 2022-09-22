@@ -301,7 +301,7 @@ def load_bitdata(f):
 
 if __name__ == "__main__":
     s = time()
-    multBits = Bitstream("FPGA-RE/Bitstreams/x.bit")
+    multBits = Bitstream("FPGA-RE/Bitstreams/bram_test.bit")
     multBits.parse_bits()
     # multBitsopp = Bitstream("FPGA-RE/Bitstreams/y.bit")
     # multBitsopp.parse_bits()

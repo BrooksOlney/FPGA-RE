@@ -88,6 +88,7 @@ set_property ip_cache_permissions {read write} [current_project]
 OPTRACE "Creating in-memory project" END { }
 OPTRACE "Adding files" START { }
 add_files D:/Research/FPGA-RE/test_init.coe
+add_files d:/Research/FPGA-RE/content.coe
 read_verilog -library xil_defaultlib D:/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/sources_1/new/primitives.v
 read_ip -quiet D:/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/sources_1/ip/blk_mem_gen_0/blk_mem_gen_0.xci
 set_property used_in_implementation false [get_files -all d:/Research/FPGA-RE/XilinxExample/XilinxExample.gen/sources_1/ip/blk_mem_gen_0/blk_mem_gen_0_ooc.xdc]

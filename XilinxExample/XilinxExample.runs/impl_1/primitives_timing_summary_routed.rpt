@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2022.1 (win64) Build 3526262 Mon Apr 18 15:48:16 MDT 2022
-| Date         : Thu Sep 15 11:53:26 2022
+| Date         : Wed Sep 21 20:41:05 2022
 | Host         : DESKTOP-66PI62R running 64-bit major release  (build 9200)
 | Command      : report_timing_summary -max_paths 10 -file primitives_timing_summary_routed.rpt -pb primitives_timing_summary_routed.pb -rpx primitives_timing_summary_routed.rpx -warn_on_violation
 | Design       : primitives

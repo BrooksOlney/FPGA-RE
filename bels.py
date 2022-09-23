@@ -191,8 +191,12 @@ class BRAM36:
 
         unpacked = np.unpackbits(toUnpack.view(np.uint8),axis=1,bitorder='little')
 
-        for i in range(64):
-            self.INIT[:,i] = unpacked[self.INITLocs[:,i,:,0],self.INITLocs[:,i,:,1]]
+        for i in range(2):
+            for j in range(64):
+                for k in range(256):
+                    self.INIT[i,j,k] = unpacked[self.INITLocs[i,j,k,0],self.INITLocs[i,j,k,1]]
+        # for i in range(64):
+        #     self.INIT[:,i] = unpacked[self.INITLocs[:,i,:,0],self.INITLocs[:,i,:,1]]
 
         for i in range(8):
             self.INITP[:,i] = unpacked[self.INITPLocs[:,i,:,0],self.INITPLocs[:,i,:,1]]

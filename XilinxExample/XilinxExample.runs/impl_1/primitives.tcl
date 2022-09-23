@@ -17,7 +17,7 @@ proc create_report { reportName command } {
   }
 }
 namespace eval ::optrace {
-  variable script "D:/Research/FPGA-RE/XilinxExample/XilinxExample.runs/impl_1/primitives.tcl"
+  variable script "/home/brookz/Research/FPGA-RE/XilinxExample/XilinxExample.runs/impl_1/primitives.tcl"
   variable category "vivado_impl"
 }
 
@@ -122,24 +122,24 @@ start_step init_design
 set ACTIVE_STEP init_design
 set rc [catch {
   create_msg_db init_design.pb
-  set_param chipscope.maxJobs 2
+  set_param chipscope.maxJobs 1
 OPTRACE "create in-memory project" START { }
   create_project -in_memory -part xc7a100tftg256-2
   set_property design_mode GateLvl [current_fileset]
   set_param project.singleFileAddWarning.threshold 0
 OPTRACE "create in-memory project" END { }
 OPTRACE "set parameters" START { }
-  set_property webtalk.parent_dir D:/Research/FPGA-RE/XilinxExample/XilinxExample.cache/wt [current_project]
-  set_property parent.project_path D:/Research/FPGA-RE/XilinxExample/XilinxExample.xpr [current_project]
-  set_property ip_output_repo D:/Research/FPGA-RE/XilinxExample/XilinxExample.cache/ip [current_project]
+  set_property webtalk.parent_dir /home/brookz/Research/FPGA-RE/XilinxExample/XilinxExample.cache/wt [current_project]
+  set_property parent.project_path /home/brookz/Research/FPGA-RE/XilinxExample/XilinxExample.xpr [current_project]
+  set_property ip_output_repo /home/brookz/Research/FPGA-RE/XilinxExample/XilinxExample.cache/ip [current_project]
   set_property ip_cache_permissions {read write} [current_project]
   set_property XPM_LIBRARIES XPM_MEMORY [current_project]
 OPTRACE "set parameters" END { }
 OPTRACE "add files" START { }
-  add_files -quiet D:/Research/FPGA-RE/XilinxExample/XilinxExample.runs/synth_1/primitives.dcp
-  read_ip -quiet D:/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/sources_1/ip/blk_mem_gen_0/blk_mem_gen_0.xci
+  add_files -quiet /home/brookz/Research/FPGA-RE/XilinxExample/XilinxExample.runs/synth_1/primitives.dcp
+  read_ip -quiet /home/brookz/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/sources_1/ip/blk_mem_gen_0/blk_mem_gen_0.xci
 OPTRACE "read constraints: implementation" START { }
-  read_xdc D:/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/constrs_1/new/a100.xdc
+  read_xdc /home/brookz/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/constrs_1/new/a100.xdc
 OPTRACE "read constraints: implementation" END { }
 OPTRACE "add files" END { }
 OPTRACE "link_design" START { }

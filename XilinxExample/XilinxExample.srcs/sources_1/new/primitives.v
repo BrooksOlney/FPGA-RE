@@ -30,7 +30,7 @@ module primitives(
     wire [7:0] addr;
 //    wire [7:0] data;
     //wire [9:0] weights;
- (*synthesis_keep = "true"*)    blk_mem_gen_0 rom (.clka(clk), .addra({op,lutOut,lutOut,op}), .douta(data));
+ (*KEEP, DONT_TOUCH*)    blk_mem_gen_0 rom (.clka(clk), .addra({op,lutOut,lutOut,op}), .douta(data));
     //assign ADDR = {8{lutOut}};
 //     weights_rom #( .N(10), .Q(8)) rom (clk, {op,op[1:0]}, weights);
    // LUT6 U4 (.O(lutOut), .I0(weights[0]), .I1(weights[1]), .I2(weights[2]), .I3(weights[3]), .I4(weights[4]), .I5(weights[5]));

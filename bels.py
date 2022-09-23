@@ -1,5 +1,6 @@
 import numpy as np
 import re 
+from copy import deepcopy
 
 class FrameInfo:
     def __init__(self,jsonData):
@@ -138,7 +139,7 @@ class BRAM36:
             # else:
             #     ramb18config[key] = val
                 
-        ramb18configs = [ramb18config, ramb18config]
+        ramb18configs = [ramb18config, deepcopy(ramb18config)]
         configs = {}
         
         for line in bramCLBSplt:
@@ -187,23 +188,28 @@ class BRAM36:
     def extract_from_tiles(self,BRAMtiles,CLBtiles):
         _,top,row,col,mnr = self.bramFrameData.decipher_frameaddr()
         offset, words = self.bramFrameData.offset, self.bramFrameData.words
-        toUnpack = np.ascontiguousarray(BRAMtiles[top][row][col][:,offset:offset+words])
+        toUnpack = np.array(BRAMtiles[top][row][col][:,offset:offset+words])
 
         unpacked = np.unpackbits(toUnpack.view(np.uint8),axis=1,bitorder='little')
 
-        for i in range(2):
-            for j in range(64):
-                for k in range(256):
-                    self.INIT[i,j,k] = unpacked[self.INITLocs[i,j,k,0],self.INITLocs[i,j,k,1]]
+        # for i in range(2):
+        #     for j in range(64):
+        #         for k in range(256):
+        #             self.INIT[i,j,k] = unpacked[self.INITLocs[i,j,k,0],self.INITLocs[i,j,k,1]]
         # for i in range(64):
         #     self.INIT[:,i] = unpacked[self.INITLocs[:,i,:,0],self.INITLocs[:,i,:,1]]
 
-        for i in range(8):
-            self.INITP[:,i] = unpacked[self.INITPLocs[:,i,:,0],self.INITPLocs[:,i,:,1]]
+        self.INIT = unpacked[self.INITLocs[:,:,:,0],self.INITLocs[:,:,:,1]]
+
+        # for i in range(8):
+            # self.INITP[:,i] = unpacked[self.INITPLocs[:,i,:,0],self.INITPLocs[:,i,:,1]]
+
+        self.INITP = unpacked[self.INITPLocs[:,:,:,0],self.INITPLocs[:,:,:,1]]
+
 
         clbDims = self.clbioFrameData.decipher_frameaddr()
-        offset, words = self.bramFrameData.offset, self.bramFrameData.words
-        clbUnpack = np.ascontiguousarray(np.array(CLBtiles)[clbDims[1]][clbDims[2]][clbDims[3]][:,offset:offset+words])
+        offset, words = self.clbioFrameData.offset, self.clbioFrameData.words
+        clbUnpack = np.array(CLBtiles[clbDims[1]][clbDims[2]][clbDims[3]][:,offset:offset+words])
         clbUnpacked = np.unpackbits(clbUnpack.view(np.uint8),axis=1,bitorder='little')
 
         vals = []

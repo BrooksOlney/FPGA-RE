@@ -12,7 +12,7 @@ module weights_rom #(parameter N=10, parameter Q=8) (
     assign rom_out = rom_reg;
      
     initial begin
-        $readmemb("F:\\Research\\NAR-Net\\HW\\Weights\\S2.mem", rom);
+        $readmemb("D:\\Research\\NAR-Net\\HW\\Weights\\S1.mem", rom);
     end
      
      

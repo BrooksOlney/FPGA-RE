@@ -4,7 +4,7 @@
 
 set TIME_start [clock seconds] 
 namespace eval ::optrace {
-  variable script "/home/brookz/Research/FPGA-RE/XilinxExample/XilinxExample.runs/synth_1/primitives.tcl"
+  variable script "D:/Research/FPGA-RE/XilinxExample/XilinxExample.runs/synth_1/primitives.tcl"
   variable category "vivado_synth"
 }
 
@@ -70,30 +70,30 @@ proc create_report { reportName command } {
   }
 }
 OPTRACE "synth_1" START { ROLLUP_AUTO }
-set_param chipscope.maxJobs 1
+set_param chipscope.maxJobs 2
 OPTRACE "Creating in-memory project" START { }
 create_project -in_memory -part xc7a100tftg256-2
 
 set_param project.singleFileAddWarning.threshold 0
 set_param project.compositeFile.enableAutoGeneration 0
 set_param synth.vivado.isSynthRun true
-set_msg_config -source 4 -id {IP_Flow 19-2162} -severity warning -new_severity info
-set_property webtalk.parent_dir /home/brookz/Research/FPGA-RE/XilinxExample/XilinxExample.cache/wt [current_project]
-set_property parent.project_path /home/brookz/Research/FPGA-RE/XilinxExample/XilinxExample.xpr [current_project]
-set_property XPM_LIBRARIES XPM_MEMORY [current_project]
+set_property webtalk.parent_dir D:/Research/FPGA-RE/XilinxExample/XilinxExample.cache/wt [current_project]
+set_property parent.project_path D:/Research/FPGA-RE/XilinxExample/XilinxExample.xpr [current_project]
 set_property default_lib xil_defaultlib [current_project]
 set_property target_language Verilog [current_project]
-set_property ip_output_repo /home/brookz/Research/FPGA-RE/XilinxExample/XilinxExample.cache/ip [current_project]
+set_property ip_output_repo d:/Research/FPGA-RE/XilinxExample/XilinxExample.cache/ip [current_project]
 set_property ip_cache_permissions {read write} [current_project]
 OPTRACE "Creating in-memory project" END { }
 OPTRACE "Adding files" START { }
-add_files /home/brookz/Research/FPGA-RE/test_init.coe
-add_files /home/brookz/Research/FPGA-RE/content.coe
-add_files /home/brookz/Research/FPGA-RE/content2.coe
-read_verilog -library xil_defaultlib /home/brookz/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/sources_1/new/primitives.v
-read_ip -quiet /home/brookz/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/sources_1/ip/blk_mem_gen_0/blk_mem_gen_0.xci
-set_property used_in_implementation false [get_files -all /home/brookz/Research/FPGA-RE/XilinxExample/XilinxExample.gen/sources_1/ip/blk_mem_gen_0/blk_mem_gen_0_ooc.xdc]
-
+add_files D:/Research/FPGA-RE/test_init.coe
+add_files D:/Research/FPGA-RE/content.coe
+add_files D:/Research/FPGA-RE/content2.coe
+add_files d:/Research/FPGA-RE/content_16_2048.coe
+add_files d:/Research/FPGA-RE/content_10_3200.coe
+read_verilog -library xil_defaultlib {
+  D:/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/sources_1/imports/HW/weights_rom.v
+  D:/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/sources_1/new/primitives.v
+}
 OPTRACE "Adding files" END { }
 # Mark all dcp files as not used in implementation to prevent them from being
 # stitched into the results of this synthesis run. Any black boxes in the
@@ -103,8 +103,8 @@ OPTRACE "Adding files" END { }
 foreach dcp [get_files -quiet -all -filter file_type=="Design\ Checkpoint"] {
   set_property used_in_implementation false $dcp
 }
-read_xdc /home/brookz/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/constrs_1/new/a100.xdc
-set_property used_in_implementation false [get_files /home/brookz/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/constrs_1/new/a100.xdc]
+read_xdc D:/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/constrs_1/new/a100.xdc
+set_property used_in_implementation false [get_files D:/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/constrs_1/new/a100.xdc]
 
 set_param ips.enableIPCacheLiteLoad 1
 close [open __synthesis_is_running__ w]

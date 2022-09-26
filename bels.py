@@ -1,5 +1,6 @@
 import numpy as np
 import re 
+from copy import deepcopy
 
 class FrameInfo:
     def __init__(self,jsonData):
@@ -138,7 +139,7 @@ class BRAM36:
             # else:
             #     ramb18config[key] = val
                 
-        ramb18configs = [ramb18config, ramb18config]
+        ramb18configs = [ramb18config, deepcopy(ramb18config)]
         configs = {}
         
         for line in bramCLBSplt:
@@ -191,19 +192,19 @@ class BRAM36:
 
         unpacked = np.unpackbits(toUnpack.view(np.uint8),axis=1,bitorder='little')
 
-        for i in range(2):
-            for j in range(64):
-                for k in range(256):
-                    self.INIT[i,j,k] = unpacked[self.INITLocs[i,j,k,0],self.INITLocs[i,j,k,1]]
         # for i in range(64):
         #     self.INIT[:,i] = unpacked[self.INITLocs[:,i,:,0],self.INITLocs[:,i,:,1]]
+        self.INIT = unpacked[self.INITLocs[:,:,:,0],self.INITLocs[:,:,:,1]]
 
-        for i in range(8):
-            self.INITP[:,i] = unpacked[self.INITPLocs[:,i,:,0],self.INITPLocs[:,i,:,1]]
+        # for i in range(8):
+        #     self.INITP[:,i] = unpacked[self.INITPLocs[:,i,:,0],self.INITPLocs[:,i,:,1]]
+
+        self.INITP = unpacked[self.INITPLocs[:,:,:,0],self.INITPLocs[:,:,:,1]]
+
 
         clbDims = self.clbioFrameData.decipher_frameaddr()
         offset, words = self.bramFrameData.offset, self.bramFrameData.words
-        clbUnpack = np.ascontiguousarray(np.array(CLBtiles)[clbDims[1]][clbDims[2]][clbDims[3]][:,offset:offset+words])
+        clbUnpack = np.ascontiguousarray(CLBtiles[clbDims[1]][clbDims[2]][clbDims[3]][:,offset:offset+words])
         clbUnpacked = np.unpackbits(clbUnpack.view(np.uint8),axis=1,bitorder='little')
 
         vals = []
@@ -213,6 +214,8 @@ class BRAM36:
             # vals.append(clbUnpacked[])
             configs[config] = clbUnpacked[inds[:,0],inds[:,1]]
         
+            setattr(self,config,clbUnpacked[inds[:,0],inds[:,1]])
+        
         bramConfigs = [{},{}]
         for i,bram in enumerate(self.bramConfigs):
             for config,val in bram.items():
@@ -221,6 +224,15 @@ class BRAM36:
                 else:
                     inds = np.array(val[0])
                 bramConfigs[i][config] = clbUnpacked[inds[:,0],inds[:,1]]
+
+                setattr(self.RAMB18s[i],config,clbUnpacked[inds[:,0],inds[:,1]])
+
+        # ramb36Contents = np.empty((64,512),np.uint8)
+        # ramb36Contents[:,::2] = self.INIT[0,:]
+        # ramb36Contents[:,1::2] = self.INIT[1,:]
+
+        self.ramb16_configs = bramConfigs
+        self.ramb36_configs = configs
 
         if np.max(self.INIT) > 0:
             print('')

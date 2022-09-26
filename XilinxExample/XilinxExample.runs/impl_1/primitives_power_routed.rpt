@@ -1,8 +1,8 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------------------------------------------------------------------------
-| Tool Version     : Vivado v.2022.1 (lin64) Build 3526262 Mon Apr 18 15:47:01 MDT 2022
-| Date             : Thu Sep 22 18:46:59 2022
-| Host             : broox1 running 64-bit Arch Linux
+| Tool Version     : Vivado v.2022.1 (win64) Build 3526262 Mon Apr 18 15:48:16 MDT 2022
+| Date             : Sun Sep 25 19:30:48 2022
+| Host             : DESKTOP-66PI62R running 64-bit major release  (build 9200)
 | Command          : report_power -file primitives_power_routed.rpt -pb primitives_power_summary_routed.pb -rpx primitives_power_routed.rpx
 | Design           : primitives
 | Device           : xc7a100tftg256-2
@@ -30,10 +30,10 @@ Table of Contents
 ----------
 
 +--------------------------+--------------+
-| Total On-Chip Power (W)  | 0.098        |
+| Total On-Chip Power (W)  | 0.119        |
 | Design Power Budget (W)  | Unspecified* |
 | Power Budget Margin (W)  | NA           |
-| Dynamic (W)              | 0.001        |
+| Dynamic (W)              | 0.022        |
 | Device Static (W)        | 0.097        |
 | Effective TJA (C/W)      | 4.6          |
 | Max Ambient (C)          | 84.5         |
@@ -56,11 +56,11 @@ Table of Contents
 | Slice Logic    |    <0.001 |        3 |       --- |             --- |
 |   LUT as Logic |    <0.001 |        1 |     63400 |           <0.01 |
 |   Others       |     0.000 |        2 |       --- |             --- |
-| Signals        |    <0.001 |       15 |       --- |             --- |
-| Block RAM      |     0.000 |      0.5 |       135 |            0.37 |
-| I/O            |    <0.001 |       16 |       170 |            9.41 |
+| Signals        |    <0.001 |       17 |       --- |             --- |
+| Block RAM      |     0.001 |      0.5 |       135 |            0.37 |
+| I/O            |     0.020 |       18 |       170 |           10.59 |
 | Static Power   |     0.097 |          |           |                 |
-| Total          |     0.098 |          |           |                 |
+| Total          |     0.119 |          |           |                 |
 +----------------+-----------+----------+-----------+-----------------+
 
 
@@ -70,9 +70,9 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
-| Vccint    |       1.000 |     0.015 |       0.000 |      0.015 |       NA    | Unspecified | NA         |
-| Vccaux    |       1.800 |     0.018 |       0.000 |      0.018 |       NA    | Unspecified | NA         |
-| Vcco33    |       3.300 |     0.004 |       0.000 |      0.004 |       NA    | Unspecified | NA         |
+| Vccint    |       1.000 |     0.017 |       0.002 |      0.015 |       NA    | Unspecified | NA         |
+| Vccaux    |       1.800 |     0.019 |       0.001 |      0.018 |       NA    | Unspecified | NA         |
+| Vcco33    |       3.300 |     0.010 |       0.006 |      0.004 |       NA    | Unspecified | NA         |
 | Vcco25    |       2.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | Vcco18    |       1.800 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | Vcco15    |       1.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
@@ -136,8 +136,11 @@ Table of Contents
 3.1 By Hierarchy
 ----------------
 
-+------+-----------+
-| Name | Power (W) |
-+------+-----------+
++------------+-----------+
+| Name       | Power (W) |
++------------+-----------+
+| primitives |     0.022 |
+|   rom      |     0.002 |
++------------+-----------+
 
 

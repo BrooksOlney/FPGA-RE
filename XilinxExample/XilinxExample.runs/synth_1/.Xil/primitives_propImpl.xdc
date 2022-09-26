@@ -1,4 +1,4 @@
-set_property SRC_FILE_INFO {cfile:/home/brookz/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/constrs_1/new/a100.xdc rfile:../../../XilinxExample.srcs/constrs_1/new/a100.xdc id:1} [current_design]
+set_property SRC_FILE_INFO {cfile:D:/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/constrs_1/new/a100.xdc rfile:../../../XilinxExample.srcs/constrs_1/new/a100.xdc id:1} [current_design]
 set_property src_info {type:XDC file:1 line:9 export:INPUT save:INPUT read:READ} [current_design]
 set_property -dict {PACKAGE_PIN E3 IOSTANDARD LVCMOS33} [get_ports clk]
 set_property src_info {type:XDC file:1 line:19 export:INPUT save:INPUT read:READ} [current_design]
@@ -15,6 +15,10 @@ set_property src_info {type:XDC file:1 line:24 export:INPUT save:INPUT read:READ
 set_property PACKAGE_PIN G1 [get_ports {op[5]}]
 set_property src_info {type:XDC file:1 line:28 export:INPUT save:INPUT read:READ} [current_design]
 set_property -dict {PACKAGE_PIN T2 IOSTANDARD LVCMOS33} [get_ports lutOut]
+set_property src_info {type:XDC file:1 line:37 export:INPUT save:INPUT read:READ} [current_design]
+set_property -dict { PACKAGE_PIN K2    IOSTANDARD LVCMOS33 } [get_ports { data[8] }]; #IO_L23P_T3_35 Sch=led3_b
+set_property src_info {type:XDC file:1 line:38 export:INPUT save:INPUT read:READ} [current_design]
+set_property -dict { PACKAGE_PIN H6    IOSTANDARD LVCMOS33 } [get_ports { data[9] }]; #IO_L24P_T3_35 Sch=led3_g
 set_property src_info {type:XDC file:1 line:73 export:INPUT save:INPUT read:READ} [current_design]
 set_property PACKAGE_PIN A7 [get_ports {data[0]}]
 set_property src_info {type:XDC file:1 line:74 export:INPUT save:INPUT read:READ} [current_design]

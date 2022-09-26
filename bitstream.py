@@ -270,38 +270,9 @@ def decipher_frameaddr(baseAddr):
 
     return (bus,top,row,col,mnr)
 
-WORD_SIZE_BITS = 32
-def load_bitdata(f):
-    """ Read bit file and return bitdata map.
-    Similar to segbits file
-
-    bitdata is a map of of two sets.
-    The map key is the frame address.
-    The first sets are the word columns that have any bits set.
-    Word columsn are WORD_SIZE_BITS wide.
-    The second sets are bit index within the frame and word if it is set.
-    """
-    bitdata = dict()
-
-    for line in f:
-        line = line.split("_")
-        frame = int(line[1], 16)
-        wordidx = int(line[2], 10)
-        bitidx = int(line[3], 10)
-
-        if frame not in bitdata:
-            bitdata[frame] = set(), set()
-
-        bitdata[frame][0].add(wordidx)
-        bitdata[frame][1].add(wordidx * WORD_SIZE_BITS + bitidx)
-
-    return bitdata
-
-
-
 if __name__ == "__main__":
     s = time()
-    multBits = Bitstream("FPGA-RE/Bitstreams/bram_test.bit")
+    multBits = Bitstream("FPGA-RE/Bitstreams/bram_test_10_3200.bit")
     multBits.parse_bits()
     # multBitsopp = Bitstream("FPGA-RE/Bitstreams/y.bit")
     # multBitsopp.parse_bits()
@@ -314,5 +285,18 @@ if __name__ == "__main__":
     
     multBits.analyze_configuration()
     multBits.load_bram_tiles('FPGA-RE/prjxray-db/artix7/xc7a100t/tilegrid.json')
+    
+    enabledBrams = [bram for bram in multBits.BRAMs if any(bram.ramb16_configs[0]['IN_USE']) or any(bram.ramb16_configs[1]['IN_USE'])]
+    
+    ramb36Contents = np.empty((64,512),np.uint8)
+    ramb36Contents[:,::2] = enabledBrams[0].INIT[0,:]
+    # ramb36Contents[:,2::3] = enabledBrams[1].INIT[0,:]
+    ramb36Contents[:,1::2] = enabledBrams[0].INIT[1,:]
+    ramb18Contents = enabledBrams[1].INIT[0]
+    r1 = enabledBrams[0].INIT[0]
+    r2 = enabledBrams[0].INIT[1]
+    r3 = enabledBrams[1].INIT[0]
+    
+    
     e = time() - s
     print('hi')

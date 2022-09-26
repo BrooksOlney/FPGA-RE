@@ -34,8 +34,8 @@ set_property -dict {PACKAGE_PIN T2 IOSTANDARD LVCMOS33} [get_ports lutOut]
 # set_property -dict { PACKAGE_PIN H4    IOSTANDARD LVCMOS33 } [get_ports { data[5] }]; #IO_L21N_T3_DQS_35 Sch=led2_b
 # set_property -dict { PACKAGE_PIN J2    IOSTANDARD LVCMOS33 } [get_ports { data[6] }]; #IO_L22N_T3_35 Sch=led2_g
 # set_property -dict { PACKAGE_PIN J3    IOSTANDARD LVCMOS33 } [get_ports { data[7] }]; #IO_L22P_T3_35 Sch=led2_r
-#set_property -dict { PACKAGE_PIN K2    IOSTANDARD LVCMOS33 } [get_ports { led3_b }]; #IO_L23P_T3_35 Sch=led3_b
-#set_property -dict { PACKAGE_PIN H6    IOSTANDARD LVCMOS33 } [get_ports { led3_g }]; #IO_L24P_T3_35 Sch=led3_g
+set_property -dict { PACKAGE_PIN K2    IOSTANDARD LVCMOS33 } [get_ports { data[8] }]; #IO_L23P_T3_35 Sch=led3_b
+set_property -dict { PACKAGE_PIN H6    IOSTANDARD LVCMOS33 } [get_ports { data[9] }]; #IO_L24P_T3_35 Sch=led3_g
 #set_property -dict { PACKAGE_PIN K1    IOSTANDARD LVCMOS33 } [get_ports { led3_r }]; #IO_L23N_T3_35 Sch=led3_r
 
 ## LEDs
@@ -245,3 +245,6 @@ set_property LOC SLICE_X88Y114 [get_cells U4]
 
 
 
+
+#set_property BEL RAMB18E1 [get_cells {rom/U0/inst_blk_mem_gen/gnbram.gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/prim_init.ram/DEVICE_7SERIES.NO_BMM_INFO.SP.SIMPLE_PRIM18.ram}]
+#set_property LOC RAMB18_X3Y47 [get_cells {rom/U0/inst_blk_mem_gen/gnbram.gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/prim_init.ram/DEVICE_7SERIES.NO_BMM_INFO.SP.SIMPLE_PRIM18.ram}]

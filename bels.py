@@ -71,28 +71,28 @@ class BRAM36:
         self.RAMB18s = [RAMB18(),RAMB18()]
         
         # BRAM/RAMB36 attributes
-        self.ADDRARDADDRL = np.zeros(15,np.uint8)
-        self.ADDRARDADDRU = np.zeros(15,np.uint8)
-        self.ADDRBWRADDRL = np.zeros(15,np.uint8)
-        self.ADDRBWRADDRU = np.zeros(15,np.uint8)
+        # self.ADDRARDADDRL = np.zeros(15,np.uint8)
+        # self.ADDRARDADDRU = np.zeros(15,np.uint8)
+        # self.ADDRBWRADDRL = np.zeros(15,np.uint8)
+        # self.ADDRBWRADDRU = np.zeros(15,np.uint8)
 
-        self.CASCOUT_ARD_ACTIVE = 0
-        self.CASCOUT_BWR_ACTIVE = 0
-        self.EN_SYN = 0
-        self.FIRST_WORD_FALL_THROUGH = 0
-        self.ZALMOST_EMPTY_OFFSET = np.zeros(13,np.uint8)
-        self.ZALMOST_FULL_OFFSET = np.zeros(13,np.uint8)
+        # self.CASCOUT_ARD_ACTIVE = 0
+        # self.CASCOUT_BWR_ACTIVE = 0
+        # self.EN_SYN = 0
+        # self.FIRST_WORD_FALL_THROUGH = 0
+        # self.ZALMOST_EMPTY_OFFSET = np.zeros(13,np.uint8)
+        # self.ZALMOST_FULL_OFFSET = np.zeros(13,np.uint8)
 
-        self.EN_ECC_READ = 0
-        self.EN_ECC_WRITE = 0
-        self.RAM_EXTENSION_A_LOWER = 0
-        self.RAM_EXTENSION_A_NONE_OR_UPPER = 0
-        self.RAM_EXTENSION_B_LOWER = 0
-        self.RAM_EXTENSION_B_NONE_OR_UPPER = 0
-        self.BRAM36_READ_WIDTH_A_1 = 0
-        self.BRAM36_READ_WIDTH_B_1 = 0
-        self.BRAM36_WRITE_WIDTH_A_1 = 0
-        self.BRAM36_WRITE_WIDTH_B_1 = 0
+        # self.EN_ECC_READ = 0
+        # self.EN_ECC_WRITE = 0
+        # self.RAM_EXTENSION_A_LOWER = 0
+        # self.RAM_EXTENSION_A_NONE_OR_UPPER = 0
+        # self.RAM_EXTENSION_B_LOWER = 0
+        # self.RAM_EXTENSION_B_NONE_OR_UPPER = 0
+        # self.BRAM36_READ_WIDTH_A_1 = 0
+        # self.BRAM36_READ_WIDTH_B_1 = 0
+        # self.BRAM36_WRITE_WIDTH_A_1 = 0
+        # self.BRAM36_WRITE_WIDTH_B_1 = 0
 
         if self.INITLocs is None:
             self.parse_segbits()
@@ -211,22 +211,36 @@ class BRAM36:
         configs = {}
         for config,val in self.configs.items():
             inds = np.array(val[0])
+            ttVals = val[1]
             # vals.append(clbUnpacked[])
-            configs[config] = clbUnpacked[inds[:,0],inds[:,1]]
+            vals = clbUnpacked[inds[:,0],inds[:,1]]
+            
+            if ttVals is not None:
+                configs[config] = all(vals == ttVals)
+            else:
+                configs[config] = vals
         
-            setattr(self,config,clbUnpacked[inds[:,0],inds[:,1]])
+            # setattr(self,config,clbUnpacked[inds[:,0],inds[:,1]])
         
         bramConfigs = [{},{}]
         for i,bram in enumerate(self.bramConfigs):
             for config,val in bram.items():
                 if type(val) == np.ndarray:
                     inds = val
+                    ttVals = None
                 else:
                     inds = np.array(val[0])
-                bramConfigs[i][config] = clbUnpacked[inds[:,0],inds[:,1]]
+                    ttVals = val[1]
+                    
+                configVals = clbUnpacked[inds[:,0],inds[:,1]]
+                # bramConfigs[i][config] = configVals
 
-                setattr(self.RAMB18s[i],config,clbUnpacked[inds[:,0],inds[:,1]])
-
+                if ttVals is not None:
+                    setattr(self.RAMB18s[i],config,all(configVals == ttVals))
+                    bramConfigs[i][config] = all(configVals == ttVals)
+                else:
+                    setattr(self.RAMB18s[i],config,configVals)
+                    bramConfigs[i][config] = configVals
         # ramb36Contents = np.empty((64,512),np.uint8)
         # ramb36Contents[:,::2] = self.INIT[0,:]
         # ramb36Contents[:,1::2] = self.INIT[1,:]
@@ -234,5 +248,13 @@ class BRAM36:
         self.ramb16_configs = bramConfigs
         self.ramb36_configs = configs
 
-        if np.max(self.INIT) > 0:
-            print('')
+        if self.ramb16_configs[0]['IN_USE'] and self.ramb16_configs[1]['IN_USE']:
+            interleaved = np.empty((64,512),np.uint8)
+            interleaved[:,::2] = self.INIT[0,:]
+            interleaved[:,1::2] = self.INIT[1,:]
+            self.interleaved = interleaved
+        else:
+            self.interleaved = None
+
+        # if np.max(self.INIT) > 0:
+        #     print('')

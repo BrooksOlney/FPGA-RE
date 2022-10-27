@@ -6,6 +6,7 @@ from zlib import crc32
 import enum
 from time import time
 from bels import BRAM36
+import os
 
 class configPacket:
     # just a container for the packets
@@ -272,7 +273,7 @@ def decipher_frameaddr(baseAddr):
 
 if __name__ == "__main__":
     s = time()
-    multBits = Bitstream("FPGA-RE/Bitstreams/bram_test_10_3200.bit")
+    multBits = Bitstream("FPGA-RE/Bitstreams/nn_io_wrapper_2.bit")
     multBits.parse_bits()
     # multBitsopp = Bitstream("FPGA-RE/Bitstreams/y.bit")
     # multBitsopp.parse_bits()
@@ -286,16 +287,30 @@ if __name__ == "__main__":
     multBits.analyze_configuration()
     multBits.load_bram_tiles('FPGA-RE/prjxray-db/artix7/xc7a100t/tilegrid.json')
     
-    enabledBrams = [bram for bram in multBits.BRAMs if any(bram.ramb16_configs[0]['IN_USE']) or any(bram.ramb16_configs[1]['IN_USE'])]
+    enabledBrams = [bram for bram in multBits.BRAMs if bram.ramb16_configs[0]['IN_USE'] or bram.ramb16_configs[1]['IN_USE']]
+    rws = [f'READ_WIDTH_A_{i}' for i in [1,2,4,9,18]]
+    bramBins = [[] for _ in range(5)]
     
-    ramb36Contents = np.empty((64,512),np.uint8)
-    ramb36Contents[:,::2] = enabledBrams[0].INIT[0,:]
-    # ramb36Contents[:,2::3] = enabledBrams[1].INIT[0,:]
-    ramb36Contents[:,1::2] = enabledBrams[0].INIT[1,:]
-    ramb18Contents = enabledBrams[1].INIT[0]
-    r1 = enabledBrams[0].INIT[0]
-    r2 = enabledBrams[0].INIT[1]
-    r3 = enabledBrams[1].INIT[0]
+    for bram in enabledBrams:
+        for i,rw in enumerate(rws):
+            if bram.ramb16_configs[0][rw] and bram.ramb16_configs[0]['IN_USE']:
+                bramBins[i].append(bram)
+                break
+            elif bram.ramb16_configs[1][rw] and bram.ramb16_configs[1]['IN_USE']:
+                bramBins[i].append(bram)
+                break
+    
+    # ramb36Contents = np.empty((64,512),np.uint8)
+    # ramb36Contents[:,::2] = enabledBrams[1].INIT[0,:]
+    # ramb36Contents[:,1::2] = enabledBrams[1].INIT[1,:]
+    
+    # ramb36Contents2 = np.empty((64,512),np.uint8)
+    # ramb36Contents2[:,::2] = enabledBrams[2].INIT[0,:]
+    # ramb36Contents2[:,1::2] = enabledBrams[2].INIT[1,:]
+    # ramb18Contents = enabledBrams[1].INIT[0]
+    # r1 = enabledBrams[0].INIT[0]
+    # r2 = enabledBrams[0].INIT[1]
+    # r3 = enabledBrams[1].INIT[0]
     
     
     e = time() - s

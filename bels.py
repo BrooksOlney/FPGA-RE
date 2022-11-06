@@ -102,7 +102,7 @@ class BRAM36:
 
     @classmethod
     def parse_segbits(cls):
-        loc = 'FPGA-RE/prjxray-db/artix7/'
+        loc = 'prjxray-db/artix7/'
         bram_file = 'segbits_bram_r.block_ram.db'
         clbio_file = 'segbits_bram_r.db'
         

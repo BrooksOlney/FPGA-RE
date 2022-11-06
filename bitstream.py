@@ -6,7 +6,7 @@ from zlib import crc32
 import enum
 from time import time
 from bels import BRAM36
-import os
+from models import *
 
 class configPacket:
     # just a container for the packets
@@ -200,23 +200,23 @@ class Bitstream:
         self.CLBgrid = gridView
         self.BRAMgrid = bramgridView
 
-        alutBits = self.load_segbits('FPGA-RE/prjxray-db/artix7/segbits_clblm_r.db')
-        blk,top,row,col,off = decipher_frameaddr(0x00001b80)
-        offset = 28
+        # alutBits = self.load_segbits('prjxray-db/artix7/segbits_clblm_r.db')
+        # blk,top,row,col,off = decipher_frameaddr(0x00001b80)
+        # offset = 28
 
-        contents = 0
-        contents = [0] * 64
-        for i, (frame, bit) in enumerate(alutBits):
-            vals = gridView[top][row][col][frame][offset:offset+2]
-            rawBits = np.unpackbits(vals.view(np.uint8),bitorder='little')
-            # contents |= ((test & (2**bit)) >> bit) << i
-            # contents |= (int(test3[bit]) << i)
-            # x = int.from_bytes(vals.tobytes(),'little')
-            # contents |= ((x & 2**bit) >> bit) << i
-            contents[i] = rawBits[bit]
+        # contents = 0
+        # contents = [0] * 64
+        # for i, (frame, bit) in enumerate(alutBits):
+        #     vals = gridView[top][row][col][frame][offset:offset+2]
+        #     rawBits = np.unpackbits(vals.view(np.uint8),bitorder='little')
+        #     # contents |= ((test & (2**bit)) >> bit) << i
+        #     # contents |= (int(test3[bit]) << i)
+        #     # x = int.from_bytes(vals.tobytes(),'little')
+        #     # contents |= ((x & 2**bit) >> bit) << i
+        #     contents[i] = rawBits[bit]
 
-        contents= np.packbits(contents,bitorder='little').view(np.uint64)[0]
-        print('')
+        # contents= np.packbits(contents,bitorder='little').view(np.uint64)[0]
+        # print('')
 
     def load_bram_tiles(self,filename):
         
@@ -273,19 +273,17 @@ def decipher_frameaddr(baseAddr):
 
 if __name__ == "__main__":
     s = time()
-    multBits = Bitstream("FPGA-RE/Bitstreams/nn_io_wrapper_2.bit")
+    multBits = Bitstream("Bitstreams/cnv_w1a1_fifo.bit")
     multBits.parse_bits()
-    # multBitsopp = Bitstream("FPGA-RE/Bitstreams/y.bit")
-    # multBitsopp.parse_bits()
-    
-    # test = np.array(multBits.configBitstream) ^ np.array(multBitsopp.configBitstream)
-    # multBits.analyze_configuration()
 
-    multBits.load_tile_grid("FPGA-RE/prjxray-db/artix7/xc7a100tftg256-2/part.json")
-    # multBits.load_tile_grid("FPGA-RE/prjxray-db/artix7/xc7a100t/tilegrid.json")
-    
+    multBits.load_tile_grid("prjxray-db/artix7/xc7a100tftg256-2/part.json")
+    # multBits.load_tile_grid("prjxray-db/artix7/xc7a100t/tilegrid.json")
+ 
     multBits.analyze_configuration()
-    multBits.load_bram_tiles('FPGA-RE/prjxray-db/artix7/xc7a100t/tilegrid.json')
+    multBits.load_bram_tiles('prjxray-db/artix7/xc7a100t/tilegrid.json')
+
+    modelWeights = load_onnx_model('../finn-examples/build/bnn-pynq/models/cnv-w1a1.onnx')
+    tfc_w1a1 = load_onnx_model('../finn-examples/build/bnn-pynq/models/tfc-w1a1.onnx')
     
     enabledBrams = [bram for bram in multBits.BRAMs if bram.ramb16_configs[0]['IN_USE'] or bram.ramb16_configs[1]['IN_USE']]
     rws = [f'READ_WIDTH_A_{i}' for i in [1,2,4,9,18]]
@@ -300,18 +298,10 @@ if __name__ == "__main__":
                 bramBins[i].append(bram)
                 break
     
-    # ramb36Contents = np.empty((64,512),np.uint8)
-    # ramb36Contents[:,::2] = enabledBrams[1].INIT[0,:]
-    # ramb36Contents[:,1::2] = enabledBrams[1].INIT[1,:]
-    
-    # ramb36Contents2 = np.empty((64,512),np.uint8)
-    # ramb36Contents2[:,::2] = enabledBrams[2].INIT[0,:]
-    # ramb36Contents2[:,1::2] = enabledBrams[2].INIT[1,:]
-    # ramb18Contents = enabledBrams[1].INIT[0]
-    # r1 = enabledBrams[0].INIT[0]
-    # r2 = enabledBrams[0].INIT[1]
-    # r3 = enabledBrams[1].INIT[0]
-    
-    
+
+    fifos = [bram for bram in enabledBrams if np.max(bram.INIT) == 0 and np.max(bram.INITP) == 0]
+    stackedBrams = [[bram for bram in bramBin if bram.ramb36_configs['RAM_EXTENSION_A_LOWER']] for bramBin in bramBins]
+    test_onnx_model('Models/tfc-w1a1.onnx')
+
     e = time() - s
-    print('hi')
+    print('')

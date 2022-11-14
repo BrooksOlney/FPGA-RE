@@ -1,97 +1,98 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GenRun Id="impl_1" LaunchPart="xc7a100tftg256-2" LaunchTime="1664148526">
-  <File Type="ROUTE-PWR" Name="primitives_power_routed.rpt"/>
-  <File Type="PA-TCL" Name="primitives.tcl"/>
-  <File Type="BITSTR-MMI" Name="primitives.mmi"/>
-  <File Type="OPT-METHODOLOGY-DRC" Name="primitives_methodology_drc_opted.rpt"/>
-  <File Type="INIT-TIMING" Name="primitives_timing_summary_init.rpt"/>
-  <File Type="ROUTE-PWR-SUM" Name="primitives_power_summary_routed.pb"/>
-  <File Type="REPORTS-TCL" Name="primitives_reports.tcl"/>
-  <File Type="OPT-TIMING" Name="primitives_timing_summary_opted.rpt"/>
-  <File Type="OPT-DCP" Name="primitives_opt.dcp"/>
-  <File Type="OPT-DRC" Name="primitives_drc_opted.rpt"/>
-  <File Type="OPT-HWDEF" Name="primitives.hwdef"/>
-  <File Type="PWROPT-DCP" Name="primitives_pwropt.dcp"/>
-  <File Type="PWROPT-DRC" Name="primitives_drc_pwropted.rpt"/>
-  <File Type="PWROPT-TIMING" Name="primitives_timing_summary_pwropted.rpt"/>
-  <File Type="PLACE-DCP" Name="primitives_placed.dcp"/>
-  <File Type="PLACE-IO" Name="primitives_io_placed.rpt"/>
-  <File Type="PLACE-CLK" Name="primitives_clock_utilization_placed.rpt"/>
-  <File Type="PLACE-UTIL" Name="primitives_utilization_placed.rpt"/>
-  <File Type="PLACE-UTIL-PB" Name="primitives_utilization_placed.pb"/>
-  <File Type="PLACE-CTRL" Name="primitives_control_sets_placed.rpt"/>
-  <File Type="PLACE-SIMILARITY" Name="primitives_incremental_reuse_placed.rpt"/>
-  <File Type="PLACE-PRE-SIMILARITY" Name="primitives_incremental_reuse_pre_placed.rpt"/>
-  <File Type="BG-BIN" Name="primitives.bin"/>
-  <File Type="PLACE-TIMING" Name="primitives_timing_summary_placed.rpt"/>
-  <File Type="POSTPLACE-PWROPT-DCP" Name="primitives_postplace_pwropt.dcp"/>
-  <File Type="BITSTR-MSK" Name="primitives.msk"/>
-  <File Type="POSTPLACE-PWROPT-TIMING" Name="primitives_timing_summary_postplace_pwropted.rpt"/>
-  <File Type="PHYSOPT-DCP" Name="primitives_physopt.dcp"/>
-  <File Type="PHYSOPT-DRC" Name="primitives_drc_physopted.rpt"/>
-  <File Type="BITSTR-RBT" Name="primitives.rbt"/>
-  <File Type="PHYSOPT-TIMING" Name="primitives_timing_summary_physopted.rpt"/>
-  <File Type="ROUTE-ERROR-DCP" Name="primitives_routed_error.dcp"/>
-  <File Type="ROUTE-DCP" Name="primitives_routed.dcp"/>
-  <File Type="ROUTE-BLACKBOX-DCP" Name="primitives_routed_bb.dcp"/>
-  <File Type="ROUTE-DRC" Name="primitives_drc_routed.rpt"/>
-  <File Type="ROUTE-DRC-PB" Name="primitives_drc_routed.pb"/>
-  <File Type="ROUTE-DRC-RPX" Name="primitives_drc_routed.rpx"/>
-  <File Type="ROUTE-METHODOLOGY-DRC" Name="primitives_methodology_drc_routed.rpt"/>
-  <File Type="ROUTE-METHODOLOGY-DRC-RPX" Name="primitives_methodology_drc_routed.rpx"/>
-  <File Type="ROUTE-METHODOLOGY-DRC-PB" Name="primitives_methodology_drc_routed.pb"/>
-  <File Type="ROUTE-PWR-RPX" Name="primitives_power_routed.rpx"/>
-  <File Type="ROUTE-STATUS" Name="primitives_route_status.rpt"/>
-  <File Type="ROUTE-STATUS-PB" Name="primitives_route_status.pb"/>
-  <File Type="ROUTE-TIMINGSUMMARY" Name="primitives_timing_summary_routed.rpt"/>
-  <File Type="ROUTE-TIMING-PB" Name="primitives_timing_summary_routed.pb"/>
-  <File Type="ROUTE-TIMING-RPX" Name="primitives_timing_summary_routed.rpx"/>
-  <File Type="ROUTE-SIMILARITY" Name="primitives_incremental_reuse_routed.rpt"/>
-  <File Type="ROUTE-CLK" Name="primitives_clock_utilization_routed.rpt"/>
-  <File Type="ROUTE-BUS-SKEW" Name="primitives_bus_skew_routed.rpt"/>
-  <File Type="ROUTE-BUS-SKEW-PB" Name="primitives_bus_skew_routed.pb"/>
-  <File Type="ROUTE-BUS-SKEW-RPX" Name="primitives_bus_skew_routed.rpx"/>
-  <File Type="POSTROUTE-PHYSOPT-DCP" Name="primitives_postroute_physopt.dcp"/>
-  <File Type="POSTROUTE-PHYSOPT-BLACKBOX-DCP" Name="primitives_postroute_physopt_bb.dcp"/>
-  <File Type="POSTROUTE-PHYSOPT-TIMING" Name="primitives_timing_summary_postroute_physopted.rpt"/>
-  <File Type="POSTROUTE-PHYSOPT-TIMING-PB" Name="primitives_timing_summary_postroute_physopted.pb"/>
-  <File Type="POSTROUTE-PHYSOPT-TIMING-RPX" Name="primitives_timing_summary_postroute_physopted.rpx"/>
-  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW" Name="primitives_bus_skew_postroute_physopted.rpt"/>
-  <File Type="BG-BIT" Name="primitives.bit"/>
-  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW-PB" Name="primitives_bus_skew_postroute_physopted.pb"/>
-  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW-RPX" Name="primitives_bus_skew_postroute_physopted.rpx"/>
-  <File Type="BITSTR-NKY" Name="primitives.nky"/>
-  <File Type="BITSTR-BMM" Name="primitives_bd.bmm"/>
-  <File Type="PDI-FILE" Name="primitives.pdi"/>
-  <File Type="RCFI_FILE" Name="primitives.rcfi"/>
-  <File Type="CFI_FILE" Name="primitives.cfi"/>
-  <File Type="RNPI_FILE" Name="primitives.rnpi"/>
-  <File Type="NPI_FILE" Name="primitives.npi"/>
-  <File Type="RBD_FILE" Name="primitives.rbd"/>
+<GenRun Id="impl_1" LaunchPart="xc7a100tftg256-2" LaunchTime="1668031121">
+  <File Type="POSTROUTE-PHYSOPT-RQS-RPT" Name="postroute_physopt_report_qor_suggestions_0.rpt"/>
+  <File Type="ROUTE-RQS-RPT" Name="route_report_qor_suggestions_0.rpt"/>
+  <File Type="POSTROUTE-PHYSOPT-RQS" Name="primitives_postroute_physopted.rqs"/>
+  <File Type="ROUTE-RQS" Name="primitives_routed.rqs"/>
+  <File Type="WBT-USG" Name="usage_statistics_webtalk.html"/>
+  <File Type="BG-DRC" Name="primitives.drc"/>
+  <File Type="BG-BGN" Name="primitives.bgn"/>
+  <File Type="BITSTR-SYSDEF" Name="primitives.sysdef"/>
   <File Type="BITSTR-LTX" Name="debug_nets.ltx"/>
   <File Type="BITSTR-LTX" Name="primitives.ltx"/>
-  <File Type="BITSTR-SYSDEF" Name="primitives.sysdef"/>
-  <File Type="BG-BGN" Name="primitives.bgn"/>
-  <File Type="BG-DRC" Name="primitives.drc"/>
+  <File Type="RBD_FILE" Name="primitives.rbd"/>
+  <File Type="NPI_FILE" Name="primitives.npi"/>
+  <File Type="RNPI_FILE" Name="primitives.rnpi"/>
+  <File Type="CFI_FILE" Name="primitives.cfi"/>
+  <File Type="RCFI_FILE" Name="primitives.rcfi"/>
   <File Type="RDI-RDI" Name="primitives.vdi"/>
-  <File Type="WBT-USG" Name="usage_statistics_webtalk.html"/>
-  <File Type="ROUTE-RQS" Name="primitives_routed.rqs"/>
-  <File Type="POSTROUTE-PHYSOPT-RQS" Name="primitives_postroute_physopted.rqs"/>
-  <File Type="ROUTE-RQS-RPT" Name="route_report_qor_suggestions_0.rpt"/>
-  <File Type="POSTROUTE-PHYSOPT-RQS-RPT" Name="postroute_physopt_report_qor_suggestions_0.rpt"/>
+  <File Type="PDI-FILE" Name="primitives.pdi"/>
+  <File Type="BITSTR-MMI" Name="primitives.mmi"/>
+  <File Type="BITSTR-BMM" Name="primitives_bd.bmm"/>
+  <File Type="BITSTR-NKY" Name="primitives.nky"/>
+  <File Type="BITSTR-RBT" Name="primitives.rbt"/>
+  <File Type="BITSTR-MSK" Name="primitives.msk"/>
+  <File Type="BG-BIN" Name="primitives.bin"/>
+  <File Type="BG-BIT" Name="primitives.bit"/>
+  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW-RPX" Name="primitives_bus_skew_postroute_physopted.rpx"/>
+  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW-PB" Name="primitives_bus_skew_postroute_physopted.pb"/>
+  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW" Name="primitives_bus_skew_postroute_physopted.rpt"/>
+  <File Type="POSTROUTE-PHYSOPT-TIMING-RPX" Name="primitives_timing_summary_postroute_physopted.rpx"/>
+  <File Type="POSTROUTE-PHYSOPT-TIMING-PB" Name="primitives_timing_summary_postroute_physopted.pb"/>
+  <File Type="POSTROUTE-PHYSOPT-TIMING" Name="primitives_timing_summary_postroute_physopted.rpt"/>
+  <File Type="POSTROUTE-PHYSOPT-BLACKBOX-DCP" Name="primitives_postroute_physopt_bb.dcp"/>
+  <File Type="POSTROUTE-PHYSOPT-DCP" Name="primitives_postroute_physopt.dcp"/>
+  <File Type="ROUTE-BUS-SKEW-RPX" Name="primitives_bus_skew_routed.rpx"/>
+  <File Type="ROUTE-BUS-SKEW-PB" Name="primitives_bus_skew_routed.pb"/>
+  <File Type="ROUTE-BUS-SKEW" Name="primitives_bus_skew_routed.rpt"/>
+  <File Type="ROUTE-CLK" Name="primitives_clock_utilization_routed.rpt"/>
+  <File Type="ROUTE-SIMILARITY" Name="primitives_incremental_reuse_routed.rpt"/>
+  <File Type="ROUTE-TIMING-RPX" Name="primitives_timing_summary_routed.rpx"/>
+  <File Type="ROUTE-TIMING-PB" Name="primitives_timing_summary_routed.pb"/>
+  <File Type="ROUTE-TIMINGSUMMARY" Name="primitives_timing_summary_routed.rpt"/>
+  <File Type="ROUTE-STATUS-PB" Name="primitives_route_status.pb"/>
+  <File Type="ROUTE-STATUS" Name="primitives_route_status.rpt"/>
+  <File Type="ROUTE-PWR-RPX" Name="primitives_power_routed.rpx"/>
+  <File Type="ROUTE-PWR-SUM" Name="primitives_power_summary_routed.pb"/>
+  <File Type="ROUTE-PWR" Name="primitives_power_routed.rpt"/>
+  <File Type="ROUTE-METHODOLOGY-DRC-PB" Name="primitives_methodology_drc_routed.pb"/>
+  <File Type="ROUTE-METHODOLOGY-DRC-RPX" Name="primitives_methodology_drc_routed.rpx"/>
+  <File Type="ROUTE-METHODOLOGY-DRC" Name="primitives_methodology_drc_routed.rpt"/>
+  <File Type="ROUTE-DRC-RPX" Name="primitives_drc_routed.rpx"/>
+  <File Type="ROUTE-DRC-PB" Name="primitives_drc_routed.pb"/>
+  <File Type="ROUTE-DRC" Name="primitives_drc_routed.rpt"/>
+  <File Type="ROUTE-BLACKBOX-DCP" Name="primitives_routed_bb.dcp"/>
+  <File Type="ROUTE-DCP" Name="primitives_routed.dcp"/>
+  <File Type="ROUTE-ERROR-DCP" Name="primitives_routed_error.dcp"/>
+  <File Type="PHYSOPT-TIMING" Name="primitives_timing_summary_physopted.rpt"/>
+  <File Type="PHYSOPT-DRC" Name="primitives_drc_physopted.rpt"/>
+  <File Type="PHYSOPT-DCP" Name="primitives_physopt.dcp"/>
+  <File Type="POSTPLACE-PWROPT-TIMING" Name="primitives_timing_summary_postplace_pwropted.rpt"/>
+  <File Type="POSTPLACE-PWROPT-DCP" Name="primitives_postplace_pwropt.dcp"/>
+  <File Type="PLACE-TIMING" Name="primitives_timing_summary_placed.rpt"/>
+  <File Type="PLACE-PRE-SIMILARITY" Name="primitives_incremental_reuse_pre_placed.rpt"/>
+  <File Type="PLACE-SIMILARITY" Name="primitives_incremental_reuse_placed.rpt"/>
+  <File Type="PLACE-CTRL" Name="primitives_control_sets_placed.rpt"/>
+  <File Type="PLACE-UTIL-PB" Name="primitives_utilization_placed.pb"/>
+  <File Type="PLACE-UTIL" Name="primitives_utilization_placed.rpt"/>
+  <File Type="PLACE-CLK" Name="primitives_clock_utilization_placed.rpt"/>
+  <File Type="PLACE-IO" Name="primitives_io_placed.rpt"/>
+  <File Type="PLACE-DCP" Name="primitives_placed.dcp"/>
+  <File Type="PWROPT-TIMING" Name="primitives_timing_summary_pwropted.rpt"/>
+  <File Type="PWROPT-DRC" Name="primitives_drc_pwropted.rpt"/>
+  <File Type="PWROPT-DCP" Name="primitives_pwropt.dcp"/>
+  <File Type="OPT-HWDEF" Name="primitives.hwdef"/>
+  <File Type="OPT-METHODOLOGY-DRC" Name="primitives_methodology_drc_opted.rpt"/>
+  <File Type="OPT-DRC" Name="primitives_drc_opted.rpt"/>
+  <File Type="OPT-DCP" Name="primitives_opt.dcp"/>
+  <File Type="OPT-TIMING" Name="primitives_timing_summary_opted.rpt"/>
+  <File Type="REPORTS-TCL" Name="primitives_reports.tcl"/>
+  <File Type="INIT-TIMING" Name="primitives_timing_summary_init.rpt"/>
+  <File Type="PA-TCL" Name="primitives.tcl"/>
   <FileSet Name="sources" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1" RelGenDir="$PGENDIR/sources_1">
     <Filter Type="Srcs"/>
-    <File Path="$PSRCDIR/sources_1/imports/HW/weights_rom.v">
+    <File Path="$PSRCDIR/sources_1/new/primitives.v">
       <FileInfo>
-        <Attr Name="ImportPath" Val="$PPRDIR/../../NAR-Net/HW/weights_rom.v"/>
-        <Attr Name="ImportTime" Val="1650378658"/>
         <Attr Name="UsedIn" Val="synthesis"/>
         <Attr Name="UsedIn" Val="implementation"/>
         <Attr Name="UsedIn" Val="simulation"/>
       </FileInfo>
     </File>
-    <File Path="$PSRCDIR/sources_1/new/primitives.v">
+    <File Path="$PSRCDIR/sources_1/imports/HW/weights_rom.v">
       <FileInfo>
+        <Attr Name="AutoDisabled" Val="1"/>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../NAR-Net/HW/weights_rom.v"/>
+        <Attr Name="ImportTime" Val="1650378658"/>
         <Attr Name="UsedIn" Val="synthesis"/>
         <Attr Name="UsedIn" Val="implementation"/>
         <Attr Name="UsedIn" Val="simulation"/>
@@ -122,6 +123,12 @@
       </FileInfo>
     </File>
     <File Path="$PPRDIR/../content_10_3200.coe">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../content_72_512.coe">
       <FileInfo>
         <Attr Name="UsedIn" Val="synthesis"/>
         <Attr Name="UsedIn" Val="simulation"/>
@@ -173,4 +180,5 @@
       <Option Id="LogicLocationFileBool">1</Option>
     </Step>
   </Strategy>
+  <BlockFileSet Type="BlockSrcs" Name="blk_mem_gen_0"/>
 </GenRun>

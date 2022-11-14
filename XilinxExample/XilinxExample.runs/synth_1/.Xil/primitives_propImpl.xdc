@@ -1,4 +1,4 @@
-set_property SRC_FILE_INFO {cfile:D:/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/constrs_1/new/a100.xdc rfile:../../../XilinxExample.srcs/constrs_1/new/a100.xdc id:1} [current_design]
+set_property SRC_FILE_INFO {cfile:/media/brookz/Storage/Research/FPGA-RE/XilinxExample/XilinxExample.srcs/constrs_1/new/a100.xdc rfile:../../../XilinxExample.srcs/constrs_1/new/a100.xdc id:1} [current_design]
 set_property src_info {type:XDC file:1 line:9 export:INPUT save:INPUT read:READ} [current_design]
 set_property -dict {PACKAGE_PIN E3 IOSTANDARD LVCMOS33} [get_ports clk]
 set_property src_info {type:XDC file:1 line:19 export:INPUT save:INPUT read:READ} [current_design]

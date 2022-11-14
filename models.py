@@ -1,7 +1,7 @@
 import onnx
 from onnx import numpy_helper
-import onnxruntime as ort
-from tensorflow.keras.datasets import mnist, cifar10
+# import onnxruntime as ort
+# from tensorflow.keras.datasets import mnist, cifar10
 # from finn.custom_op.general import *
 # from finn.core.modelwrapper import ModelWrapper
 

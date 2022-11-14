@@ -285,7 +285,7 @@ if __name__ == "__main__":
     modelWeights = load_onnx_model('../finn-examples/build/bnn-pynq/models/cnv-w1a1.onnx')
     tfc_w1a1 = load_onnx_model('../finn-examples/build/bnn-pynq/models/tfc-w1a1.onnx')
     
-    enabledBrams = [bram for bram in multBits.BRAMs if bram.ramb16_configs[0]['IN_USE'] or bram.ramb16_configs[1]['IN_USE']]
+    enabledBrams = [bram for bram in multBits.BRAMs if (bram.ramb16_configs[0]['IN_USE'] or bram.ramb16_configs[1]['IN_USE']) and not bram.IS_FIFO]
     rws = [f'READ_WIDTH_A_{i}' for i in [1,2,4,9,18]]
     bramBins = [[] for _ in range(5)]
     
@@ -298,10 +298,22 @@ if __name__ == "__main__":
                 bramBins[i].append(bram)
                 break
     
+    contentShapes = set([b.content.shape for b in enabledBrams])
+    contentShapes = {shape: [] for shape in contentShapes}
+    for bram in enabledBrams:
+        contentShapes[bram.content.shape].append(bram)
 
     fifos = [bram for bram in enabledBrams if np.max(bram.INIT) == 0 and np.max(bram.INITP) == 0]
-    stackedBrams = [[bram for bram in bramBin if bram.ramb36_configs['RAM_EXTENSION_A_LOWER']] for bramBin in bramBins]
-    test_onnx_model('Models/tfc-w1a1.onnx')
+    # stackedBrams = [[bram for bram in bramBin if bram.ramb36_configs['EN_SYN'] ] for bramBin in bramBins]
+    
+
+    slices = [12,7,11,6,10,1,8,13,9,4,3,2,5,0]
+    l4_brams_ordered = [contentShapes[(2304,9)][i] for i in slices] + [contentShapes[(2304,2)][0]] 
+
+    l0_brams = enabledBrams[5]
+    conts = l0_brams.content
+    # contsTmp = conts[:,:np.where(~conts.any(axis=0))[0][0]]
+
 
     e = time() - s
     print('')

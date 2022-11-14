@@ -10,7 +10,11 @@ def gen_memory(filename,content,width,depth):
 def gen_random_memory(filename,width,depth):
     with open(filename, 'w') as ofile:
         ofile.write("memory_initialization_radix=2;\nmemory_initialization_vector=\n\n")
-        allContent = np.random.randint(0,2**width,depth)
+        if width <= 64:
+            allContent = np.random.randint(0,2**width,depth)
+        else:
+            allContent = [random.randint(0,2**width) for _ in range(depth)]
+            
         strs = [bin(c)[2:].zfill(width) for c in allContent]
         print(strs)
         ofile.write(',\n'.join(strs)+';')

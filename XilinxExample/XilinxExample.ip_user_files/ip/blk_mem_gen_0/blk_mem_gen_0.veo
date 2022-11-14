@@ -57,8 +57,8 @@
 blk_mem_gen_0 your_instance_name (
   .clka(clka),    // input wire clka
   .ena(ena),      // input wire ena
-  .addra(addra),  // input wire [11 : 0] addra
-  .douta(douta)  // output wire [9 : 0] douta
+  .addra(addra),  // input wire [15 : 0] addra
+  .douta(douta)  // output wire [71 : 0] douta
 );
 // INST_TAG_END ------ End INSTANTIATION Template ---------
 

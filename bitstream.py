@@ -6,7 +6,9 @@ from zlib import crc32
 import enum
 from time import time
 from bels import BRAM36
+from clbs import CLBLM,CLBLL
 from models import *
+from bram_clustering import kmeans_clustering
 
 class configPacket:
     # just a container for the packets
@@ -221,16 +223,34 @@ class Bitstream:
     def load_bram_tiles(self,filename):
         
         BRAMs = []
+        CLBLMs = []
+        CLBLLs = []
     
         with open(filename,'r') as tfile:
             tilegrid = json.load(tfile)
-            for bram in [i for i in tilegrid.keys() if 'BRAM_L' in i or "BRAM_R" in i]:
-                BRAMs.append(BRAM36(tilegrid[bram]))
+            # for bram in [i for i in tilegrid.keys() if 'BRAM_L' in i or "BRAM_R" in i]:
+            #     BRAMs.append(BRAM36(tilegrid[bram]))
+
+            for item in tilegrid.keys():
+                if "BRAM_L" in item or "BRAM_R" in item:
+                    BRAMs.append(BRAM36(tilegrid[item]))
+
+                elif "CLBLM" in item:
+                    CLBLMs.append(CLBLM(tilegrid[item]))
+
+                elif "CLBLL" in item:
+                    CLBLLs.append(CLBLL(tilegrid[item]))
 
         self.BRAMs = BRAMs
 
         for BRAM in self.BRAMs:
             BRAM.extract_from_tiles(self.BRAMgrid,self.CLBgrid)
+
+        for CLB in CLBLMs:
+            CLB.extract_from_tiles(self.CLBgrid)
+
+        for CLB in CLBLLs:
+            CLB.extract_from_tiles(self.CLBgrid)
 
 
     def load_segbits(self,filename):
@@ -271,6 +291,8 @@ def decipher_frameaddr(baseAddr):
 
     return (bus,top,row,col,mnr)
 
+# def convert_content_to_matrix(content,PE,SIMD,N):
+
 if __name__ == "__main__":
     s = time()
     multBits = Bitstream("Bitstreams/cnv_w1a1_fifo.bit")
@@ -286,34 +308,81 @@ if __name__ == "__main__":
     tfc_w1a1 = load_onnx_model('../finn-examples/build/bnn-pynq/models/tfc-w1a1.onnx')
     
     enabledBrams = [bram for bram in multBits.BRAMs if (bram.ramb16_configs[0]['IN_USE'] or bram.ramb16_configs[1]['IN_USE']) and not bram.IS_FIFO]
-    rws = [f'READ_WIDTH_A_{i}' for i in [1,2,4,9,18]]
-    bramBins = [[] for _ in range(5)]
     
-    for bram in enabledBrams:
-        for i,rw in enumerate(rws):
-            if bram.ramb16_configs[0][rw] and bram.ramb16_configs[0]['IN_USE']:
-                bramBins[i].append(bram)
-                break
-            elif bram.ramb16_configs[1][rw] and bram.ramb16_configs[1]['IN_USE']:
-                bramBins[i].append(bram)
-                break
+    enabledBrams[4].content = enabledBrams[4].content[:36]
     
     contentShapes = set([b.content.shape for b in enabledBrams])
     contentShapes = {shape: [] for shape in contentShapes}
     for bram in enabledBrams:
         contentShapes[bram.content.shape].append(bram)
+        
 
     fifos = [bram for bram in enabledBrams if np.max(bram.INIT) == 0 and np.max(bram.INITP) == 0]
     # stackedBrams = [[bram for bram in bramBin if bram.ramb36_configs['EN_SYN'] ] for bramBin in bramBins]
     
+    """
+        L0: (36,48)
+        L1: (36,72) + (36,16)
+        L2: (144,72) + (144,8)
+        L3: (288,72) + (288,8)
+        L4: (2304,9) + (2304,2)
+        L5: (18432,1) + (256,9)
+        L6: (32768,1) x 4
+        L7: (32768,1) x 8
+        L8: (1024,5)
+    """
 
     slices = [12,7,11,6,10,1,8,13,9,4,3,2,5,0]
-    l4_brams_ordered = [contentShapes[(2304,9)][i] for i in slices] + [contentShapes[(2304,2)][0]] 
+    # l4_brams_ordered = [contentShapes[(2304,9)][i] for i in slices] + [contentShapes[(2304,2)][0]] 
+
+    l2slices = [37,36,38,67,66,64,65,68]
+    l2_brams_ordered = [enabledBrams[l2] for l2 in l2slices]
+
+    l6_slices = [86,88,74,87]
+    l6_brams_ordered = [enabledBrams[l6] for l6 in l6_slices]
+
+    l7_slices = [20,50,17,21,48,18,16,49]
+    l7_brams_ordered = [enabledBrams[l7] for l7 in l7_slices]
 
     l0_brams = enabledBrams[5]
     conts = l0_brams.content
     # contsTmp = conts[:,:np.where(~conts.any(axis=0))[0][0]]
 
+    bramDict = {f'{(bram.x,bram.y)}':bram for bram in enabledBrams}
+    x_dict = {19: 0, 94: 1, 108: 2, 128: 3}
+    cols = np.arange(5,205,5)
+    breaks = np.arange(5,5*8,5)
+    for i in breaks:
+        cols[i:] += 1
+    y_dict = {col: i for i,col in enumerate(cols)}
+
+    xdata = np.array([[bram.x,bram.y,*bram.content.shape,bram.content.size/36864] for bram in enabledBrams])
+    xdata = np.empty((len(enabledBrams),4))
+    for i,bram in enumerate(enabledBrams):
+        ard = int(bram.ramb36_configs['CASCOUT_ARD_ACTIVE'] or sum(bram.ADDRARDADDRU) != 0 or sum(bram.ADDRARDADDRL) != 0)
+        bwr = int(bram.ramb36_configs['CASCOUT_BWR_ACTIVE'] or sum(bram.ADDRBWRADDRU) != 0 or sum(bram.ADDRBWRADDRL) != 0)
+        
+        xdata[i] = (x_dict[bram.x],y_dict[bram.y],
+                    bram.content.shape[0], 
+                    1 - (np.count_nonzero(bram.content) / (36864 if bram.SYN and np.max(bram.INITP) else 32768 if bram.SYN else 18432 if np.max(bram.INITP) else 16384)))
+                    # bram.SYN,
+                    # sum([*bram.ADDRARDADDRL,*bram.ADDRARDADDRU]),
+                    # sum([*bram.ADDRBWRADDRL,*bram.ADDRBWRADDRU]))
+    
+    # kmeans_clustering(xdata, enabledBrams)
+
+    bins = []
+    groups = [1024,2304,256,18432,144,36,288,512]
+            
+    for group in groups:
+        brambin = []
+        for key,val in contentShapes.items():
+            if key[0] == group:
+                brambin.extend(val)
+
+        bins.append(brambin)
+
+    # plt.show()
 
     e = time() - s
     print('')

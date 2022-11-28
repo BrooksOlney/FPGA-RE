@@ -75,41 +75,11 @@ class BRAM36:
         self.RAMB18s = [RAMB18(),RAMB18()]
         
         # BRAM/RAMB36 attributes
-        # self.BRAM_R_IMUX_ADDRARDADDRL = np.zeros(15,np.uint8)
-        # self.BRAM_R_IMUX_ADDRARDADDRU = np.zeros(15,np.uint8)
-        # self.BRAM_R_IMUX_ADDRBWRADDRL = np.zeros(15,np.uint8)
-        # self.BRAM_R_IMUX_ADDRBWRADDRU = np.zeros(15,np.uint8)
-
         self.ADDRARDADDRL = np.zeros(15,np.uint8)
         self.ADDRARDADDRU = np.zeros(15,np.uint8)
         self.ADDRBWRADDRL = np.zeros(15,np.uint8)
         self.ADDRBWRADDRU = np.zeros(15,np.uint8)
         
-        # self.BRAM_CASCINBOT_ADDRARDADDRU = np.zeros(15,np.uint8)
-        # self.BRAM_CASCINTOP_ADDRARDADDRU = np.zeros(15,np.uint8)
-        
-        # self.BRAM_CASCINBOT_ADDRBWRADDRU = np.zeros(15,np.uint8)
-        # self.BRAM_CASCINTOP_ADDRBWRADDRU = np.zeros(15,np.uint8)
-
-        # self.ADDRBWRADDRL = np.zeros(15,np.uint8)
-        # self.ADDRBWRADDRU = np.zeros(15,np.uint8)
-        # self.CASCOUT_ARD_ACTIVE = 0
-        # self.CASCOUT_BWR_ACTIVE = 0
-        # self.EN_SYN = 0
-        # self.FIRST_WORD_FALL_THROUGH = 0
-        # self.ZALMOST_EMPTY_OFFSET = np.zeros(13,np.uint8)
-        # self.ZALMOST_FULL_OFFSET = np.zeros(13,np.uint8)
-
-        # self.EN_ECC_READ = 0
-        # self.EN_ECC_WRITE = 0
-        # self.RAM_EXTENSION_A_LOWER = 0
-        # self.RAM_EXTENSION_A_NONE_OR_UPPER = 0
-        # self.RAM_EXTENSION_B_LOWER = 0
-        # self.RAM_EXTENSION_B_NONE_OR_UPPER = 0
-        # self.BRAM36_READ_WIDTH_A_1 = 0
-        # self.BRAM36_READ_WIDTH_B_1 = 0
-        # self.BRAM36_WRITE_WIDTH_A_1 = 0
-        # self.BRAM36_WRITE_WIDTH_B_1 = 0
 
         if self.INITLocs is None:
             self.parse_segbits()
@@ -281,10 +251,6 @@ class BRAM36:
         self.ramb16_configs = bramConfigs
         self.ramb36_configs = configs
 
-        # casc_addr_buses = ['BRAM_R_IMUX_ADDRARDADDRL', 'BRAM_R_IMUX_ADDRARDADDRU', 
-        #                     'BRAM_R_IMUX_ADDRBWRADDRL','BRAM_R_IMUX_ADDRBWRADDRU',
-        #                     'BRAM_CASCINBOT_ADDRARDADDRU', 'BRAM_CASCINTOP_ADDRARDADDRU',
-        #                     'BRAM_CASCINBOT_ADDRBWRADDRU', 'BRAM_CASCINTOP_ADDRBWRADDRU']
         casc_addr_buses = ['ADDRARDADDRL', 'ADDRARDADDRU', 'ADDRBWRADDRL', 'ADDRBWRADDRU']
 
         for bus in casc_addr_buses:
@@ -299,10 +265,12 @@ class BRAM36:
                     # if busType == '':
                     #     print()
                     conts[i//3] = busType
-                    # break
-
-            # for i in range(15):
-            #     conts[i] = configs[bus+str(i)]
+                    if 'IMUX' in busType:
+                        conts[i//3] = 0
+                    elif 'CASCINTOP' in busType:
+                        conts[i//3] = 1
+                    else:
+                        conts[i//3] = -1
             
             setattr(self,bus,conts)
 
@@ -384,21 +352,16 @@ class BRAM36:
             newIdx = np.empty((test.shape[0],pWidth + iWidth),dtype=np.uint8)
             newIdx[:,:iWidth] = test
             newIdx[:,iWidth:] = test2[:test.shape[0]]
-            idx_from = newIdx.reshape(-1,256+32)
+            # idx_from = newIdx.reshape(-1,256+32)
+            idx_from = newIdx.reshape(-1,576 if self.SYN else 288)
             width = pWidth + iWidth
 
-
+        self.read_width = width
         # self.content = idx_from.reshape(-1,width)
         end = np.where(~idx_from.any(axis=1))[0]
         content = idx_from[:end[0] if len(end) else None].flatten().reshape(-1,width)
-        end1 = np.where(~content.any(axis=1))[0]
+        # end1 = np.where(~content.any(axis=1))[0]
         end2 = np.where(~content.any(axis=0))[0]
-
+        # self.content = content
         self.content = content[:,:end2[0] if len(end2) else None]
         
-        # end1 = np.where(content.any(axis=1))[0]
-        # end2 = np.where(content.any(axis=0))[0]
-        # if len(end1) or len(end2):
-        #     self.content = content[end1[:,None] if len(end1) else range(content.shape[0]),end2 if len(end2) else range(content.shape[1])]
-        # else:
-        #     self.content = content

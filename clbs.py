@@ -158,7 +158,7 @@ class CLBLL(CLB):
         _,top,row,col,mnr = self.clblmFrameData.decipher_frameaddr()
         offset, words = self.clblmFrameData.offset, self.clblmFrameData.words
         toUnpack = np.ascontiguousarray(CLBtiles[top][row][col][:,offset:offset+words])
-        print('')
+        # print('')
 
 
 class CLBLM(CLB):
@@ -180,6 +180,6 @@ class CLBLM(CLB):
         for cfg in lconfigs:
             setattr(self.SLICEL_X1, cfg[0],True)
             
-            print('')
+            # print('')
         
-        print('')
+        # print('')

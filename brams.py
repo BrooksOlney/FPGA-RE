@@ -46,7 +46,7 @@ class BRAM36:
 
     def __init__(self,name,jsonData,frameInfos,contents):
         self.name = name
-        self.LR = int(name[5] == "L")
+        self.LR = int(name[5] == "R")
         self.x,self.y = list(map(int, re.findall(r'[0-9]+',name)))
         self.grid_x = jsonData['grid_x']
         self.grid_y = jsonData['grid_y']
@@ -72,6 +72,9 @@ class BRAM36:
 
     def __repr__(self):
         return f'BRAM({hex(self.bramFrameData.baseAddr)} - {(self.x,self.y)}) - {(self.grid_x,self.grid_y)}'
+
+    def __hash__(self):
+        return hash(self.name)
 
     def extract_from_tiles_v2(self):
 
@@ -111,6 +114,12 @@ class BRAM36:
             else:
                 toEdit[_config] = vals
 
+        
+        if self.RAMB18s[0].SDP_READ_WIDTH > 0:
+            self.SDP = True
+        else:
+            self.SDP = False
+            
         self.ramb18_configs = bramConfigs
         self.ramb36_configs = configs
 
@@ -422,11 +431,7 @@ class BRAM36:
         iWidth = width
 
         if pWidth:
-
-            if self.x == 94 and self.y == 129:
-                print('')
             test = idx_from.reshape(-1,iWidth)
-            # test2 = self.INITP.reshape(-1,pWidth)
             test2 = parity_from.reshape(-1,pWidth)
 
             newIdx = np.empty((test.shape[0],pWidth + iWidth),dtype=np.uint8)

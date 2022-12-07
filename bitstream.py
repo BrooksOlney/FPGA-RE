@@ -292,17 +292,99 @@ def proc_func(item,tilegrid,config,ppips,grid):
     belType = tilegrid[item]['type']
     return bel_generator(item,belType,tilegrid[item],config[belType],ppips[belType],grid)
 
+def traverse_from_bram(bram,brams,ints,int_conn_map):
+    intMap = {i.name: i for i in ints if len(i.conns)}
+    bramMap = {(b.x,b.y): b for b in brams}
+    
+    # directionMap = {'NN': }
+    allSrcs = list(set([net[0].split('.')[1] for net in ints[0].configs[0]]))
+    allDsts = list(set([net[0].split('.')[0] for net in ints[0].configs[0]]))
+    allSrcs.sort()
+    allDsts.sort()
 
-def decipher_frameaddr(baseAddr):
-    bus = (baseAddr >> 23) & 0x7
-    top = (baseAddr >> 22) & 0x1
-    row = (baseAddr >> 17) & 0x1f
-    col = (baseAddr >> 7)  & 0x3ff
-    mnr = (baseAddr >> 0)  & 0x3f
+    allSrcs2 = list(set([net[0].split('.')[1] for net in ints[0].configs[1]]))
+    allDsts2 = list(set([net[0].split('.')[0] for net in ints[0].configs[1]]))
+    allSrcs2.sort()
+    allDsts2.sort()
 
-    return (bus,top,row,col,mnr)
 
-# def convert_content_to_matrix(content,PE,SIMD,N):
+def bin_brams(brams,ints):
+
+    def get_neighbors(i,net):
+        neighbors = []
+        
+        # src = i.dsts[net]
+        if net not in i.connDirs.keys():
+            return neighbors
+        src = i.connDirs[net]
+        
+        for s in src:
+            outsideInt = i.connMap[s]
+            internalDst = i.connDirs[s]
+        
+            for dst in internalDst:
+                if dst == net:
+                    continue
+                externalDsts = i.connMap[dst]
+
+                if isinstance(externalDsts,list):
+                    neighbors.extend(externalDsts)
+                else:
+                    neighbors.append(externalDsts)
+
+            # for dst in outsideInt:
+            if isinstance(outsideInt,list):
+                neighbors.extend(outsideInt)
+            else:
+                neighbors.append(outsideInt)
+        
+        return neighbors
+
+    intMap = {i.name: i for i in ints if len(i.conns)}
+    bramMap = {b.name: b for b in brams}
+    bramSet = set(brams)
+
+    clkEnableSDP = ['IMUX_L19', 'IMUX19']
+    clkEnableTDP = ['IMUX_L35','IMUX35']
+
+    intIdx = 2
+    bramBins = []
+
+    while bramSet:
+        # get new BRAM, remove from set
+        bram = list(bramSet)[0]
+        bramSet -= {bram}
+        bramBin = set()
+        
+        # get key for BRAM->INT tile
+        linkKey = f'INT_{"R" if bram.LR else "L"}_X{bram.x}Y{bram.y+intIdx}'
+        bramEnINT = intMap[linkKey]
+        
+        # clk enable comes from different net for SDP/TDP, and L/R BRAMs
+        ceKey = clkEnableSDP[bram.LR] if bram.SDP else clkEnableTDP[bram.LR]
+        path = get_neighbors(bramEnINT,ceKey)
+        visited = set()
+
+        while path:
+            el = path.pop(0)
+            if el in list(visited):
+                continue
+            else:
+                visited.add(el)
+            if el == '':
+                continue
+            tile,node = el.split('/')
+            if "BRAM_L" in tile or "BRAM_R" in tile:
+                b = bramMap[tile]
+                bramBin.add(b)
+                bramSet -= {b}
+            elif "INT_L" in tile or "INT_R" in tile:
+                if tile in intMap.keys():
+                    path += get_neighbors(intMap[tile],node)
+
+        bramBins.append(bramBin)
+
+    return bramBins
 
 if __name__ == "__main__":
     s = time()
@@ -395,6 +477,22 @@ if __name__ == "__main__":
 
     # plt.show()
 
+    # int_conn_map = json.load(open('int_conn_map.json','r'))
+    # multBits.int_conn_map = int_conn_map
+    s2 = time()
+    with open('int_conn_map5.json','r') as jsonFile:
+        jsonData = json.load(jsonFile)
+        for i in multBits.INTs:
+            i.connMap = jsonData[i.name]
 
+    del jsonData
     e = time() - s
+    e2 = time() - s2
+    enabledInts = [i for i in multBits.INTs if len(i.conns)]
+    bin_brams(enabledBrams,enabledInts)
+
+
+    # traverse_from_bram(enabledBrams[0],enabledBrams,multBits.INTs,multBits.int_conn_map)
+
+
     print('')

@@ -7,7 +7,7 @@ class INT:
     def __init__(self,name,jsonData,frameInfos,contents):
         self.name = name
         self.x,self.y = list(map(int, re.findall(r'[0-9]+',name)))
-        self.LR = int(name[5] == "L")
+        self.LR = int(name[4] == "R")
 
         self.grid_x = jsonData['grid_x']
         self.grid_y = jsonData['grid_y']
@@ -23,6 +23,7 @@ class INT:
 
         conns = []
         cfgs = self.configs[self.LR]
+        connDirs = {}
 
         if np.max(self.contents):
             for cfg in cfgs:
@@ -32,10 +33,22 @@ class INT:
                 match = all(self.contents[bits[:,0],bits[:,1]] == ttvals)
                 if match:
                     conns.append((dst,src))
+                    
+                    if src in connDirs.keys():
+                        connDirs[src] += [dst]
+                    else:
+                        connDirs[src] = [dst]
+
+                    if dst in connDirs.keys():
+                        connDirs[dst] += [src]
+                    else:
+                        connDirs[dst] = [src]
 
         # merged = np.concatenate([cfg[1] for cfg in cfgs])
         # bins = np.array([cfg[1].shape[0] for cfg in cfgs])
-
+        # self.dsts = dsts
+        # self.srcs = srcs
+        self.connDirs = connDirs
         # ttvals = np.concatenate([cfg[2] for cfg in cfgs])
         # ttvals = np.array(np.split(ttvals,bins.cumsum()[:-1]))
         # sliced = self.contents[merged[:,0],merged[:,1]]

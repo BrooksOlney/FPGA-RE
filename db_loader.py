@@ -32,7 +32,6 @@ class FrameInfo:
 
 class prjXrayDB:
     def __init__(self,dbPath,device,part):
-        # not implemented
         self.dbPath = dbPath
         self.device = device
         self.part   = part

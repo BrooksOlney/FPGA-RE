@@ -317,7 +317,7 @@ def bin_brams(brams,ints):
         if net not in i.connDirs.keys():
             return neighbors
         src = i.connDirs[net]
-        
+
         for s in src:
             outsideInt = i.connMap[s]
             internalDst = i.connDirs[s]
@@ -338,6 +338,11 @@ def bin_brams(brams,ints):
             else:
                 neighbors.append(outsideInt)
         
+        fromConn = i.connMap[net]
+        if isinstance(fromConn,str):
+            fromConn = [fromConn]
+
+        neighbors += fromConn
         return neighbors
 
     intMap = {i.name: i for i in ints if len(i.conns)}
@@ -361,10 +366,12 @@ def bin_brams(brams,ints):
         bramEnINT = intMap[linkKey]
         
         # clk enable comes from different net for SDP/TDP, and L/R BRAMs
-        ceKey = clkEnableSDP[bram.LR] if bram.SDP else clkEnableTDP[bram.LR]
+        ceKey = clkEnableSDP[bram.LR] if bram.SDP or not bram.ramb18_configs[0]['DOB_REG'] else clkEnableTDP[bram.LR]
         path = get_neighbors(bramEnINT,ceKey)
         visited = set()
-
+        exclude = False
+        if bram.name == "BRAM_L_X38Y135":
+            print('')
         while path:
             el = path.pop(0)
             if el in list(visited):
@@ -374,21 +381,28 @@ def bin_brams(brams,ints):
             if el == '':
                 continue
             tile,node = el.split('/')
+            if "CLBLL_IMUX" in node:
+                exclude = True
+                break
+            if tile == "INT_L_X36Y126":
+                print("")
             if "BRAM_L" in tile or "BRAM_R" in tile:
-                b = bramMap[tile]
-                bramBin.add(b)
-                bramSet -= {b}
+                if tile in bramMap.keys():
+                    b = bramMap[tile]
+                    bramBin.add(b)
+                    bramSet -= {b}
             elif "INT_L" in tile or "INT_R" in tile:
                 if tile in intMap.keys():
                     path += get_neighbors(intMap[tile],node)
-
-        bramBins.append(bramBin)
+        
+        if not exclude:
+            bramBins.append(list(bramBin))
 
     return bramBins
 
 if __name__ == "__main__":
     s = time()
-    multBits = Bitstream("Bitstreams/cnv_w1a1_fifo.bit")
+    multBits = Bitstream("Bitstreams/cnvw1a1_fifo_try2.bit")
     multBits.parse_bits()
 
     multBits.load_tile_grid("prjxray-db/artix7/xc7a100tftg256-2/part.json")
@@ -397,7 +411,7 @@ if __name__ == "__main__":
     multBits.analyze_configuration()
     multBits.load_bram_tiles('prjxray-db/artix7/xc7a100t/tilegrid.json')
 
-    modelWeights = load_onnx_model('../finn-examples/build/bnn-pynq/models/cnv-w1a1.onnx')
+    modelWeights = load_onnx_model('Models/cnv_1w1a-758c8fef.pth')
     tfc_w1a1 = load_onnx_model('../finn-examples/build/bnn-pynq/models/tfc-w1a1.onnx')
     
     enabledBrams = [bram for bram in multBits.BRAMs if (bram.ramb18_configs[0]['IN_USE'] or bram.ramb18_configs[1]['IN_USE']) and not bram.IS_FIFO]
@@ -424,61 +438,6 @@ if __name__ == "__main__":
         L7: (32768,1) x 8
         L8: (1024,5)
     """
-
-    # slices = [12,7,11,6,10,1,8,13,9,4,3,2,5,0]
-    # # l4_brams_ordered = [contentShapes[(2304,9)][i] for i in slices] + [contentShapes[(2304,2)][0]] 
-
-    # l2slices = [37,36,38,67,66,64,65,68]
-    # l2_brams_ordered = [enabledBrams[l2] for l2 in l2slices]
-
-    # l6_slices = [86,88,74,87]
-    # l6_brams_ordered = [enabledBrams[l6] for l6 in l6_slices]
-
-    # l7_slices = [20,50,17,21,48,18,16,49]
-    # l7_brams_ordered = [enabledBrams[l7] for l7 in l7_slices]
-
-    # l0_brams = enabledBrams[5]
-    # conts = l0_brams.content
-    # # contsTmp = conts[:,:np.where(~conts.any(axis=0))[0][0]]
-
-    # bramDict = {f'{(bram.x,bram.y)}':bram for bram in enabledBrams}
-    # x_dict = {19: 0, 94: 1, 108: 2, 128: 3}
-    # cols = np.arange(5,205,5)
-    # breaks = np.arange(5,5*8,5)
-    # for i in breaks:
-    #     cols[i:] += 1
-    # y_dict = {col: i for i,col in enumerate(cols)}
-
-    # xdata = np.array([[bram.x,bram.y,*bram.content.shape,bram.content.size/36864] for bram in enabledBrams])
-    # xdata = np.empty((len(enabledBrams),4))
-    # for i,bram in enumerate(enabledBrams):
-    #     ard = int(bram.ramb36_configs['CASCOUT_ARD_ACTIVE'] or sum(bram.ADDRARDADDRU) != 0 or sum(bram.ADDRARDADDRL) != 0)
-    #     bwr = int(bram.ramb36_configs['CASCOUT_BWR_ACTIVE'] or sum(bram.ADDRBWRADDRU) != 0 or sum(bram.ADDRBWRADDRL) != 0)
-        
-    #     xdata[i] = (x_dict[bram.x],y_dict[bram.y],
-    #                 bram.content.shape[0], 
-    #                 1 - (np.count_nonzero(bram.content) / (36864 if bram.SYN and np.max(bram.INITP) else 32768 if bram.SYN else 18432 if np.max(bram.INITP) else 16384)))
-    #                 # bram.SYN,
-    #                 # sum([*bram.ADDRARDADDRL,*bram.ADDRARDADDRU]),
-    #                 # sum([*bram.ADDRBWRADDRL,*bram.ADDRBWRADDRU]))
-    
-    # # kmeans_clustering(xdata, enabledBrams)
-
-    # bins = []
-    # groups = [1024,2304,256,18432,144,36,288,512]
-            
-    # for group in groups:
-    #     brambin = []
-    #     for key,val in contentShapes.items():
-    #         if key[0] == group:
-    #             brambin.extend(val)
-
-    #     bins.append(brambin)
-
-    # plt.show()
-
-    # int_conn_map = json.load(open('int_conn_map.json','r'))
-    # multBits.int_conn_map = int_conn_map
     s2 = time()
     with open('int_conn_map5.json','r') as jsonFile:
         jsonData = json.load(jsonFile)
@@ -489,10 +448,28 @@ if __name__ == "__main__":
     e = time() - s
     e2 = time() - s2
     enabledInts = [i for i in multBits.INTs if len(i.conns)]
-    bin_brams(enabledBrams,enabledInts)
+    s = time()
+    bramBins = bin_brams(enabledBrams,enabledInts)
+    e3 = time() - s
+    sizes = []
+    for bramBin in bramBins:
+        totalSize = sum([b.content.size for b in bramBin])
+        sizes.append(totalSize)
 
-
-    # traverse_from_bram(enabledBrams[0],enabledBrams,multBits.INTs,multBits.int_conn_map)
-
+    bramMap = {(bram.x,bram.y):bram for bram in enabledBrams}
+    mva1 = [(38,0) ,(38,10),(44,0) ,(44,5) ,(38,5) ,(6,5)  ,(6,15) ,(44,15),(44,10),(44,20),(38,15),(38,20),(6,0)  ,(6,10) ,(6,20) ]
+    mva2 = [(38,40),(38,35),(38,45),(44,40),(44,35),(44,25),(44,30),(44,45)]
+    mva3 = [(38,85),(44,80),(38,75),(44,70),(51,80),(51,85),(44,90),(51,90)]
+    mva4 = [(44,65),(6,90) ,(38,80),(6,85) ,(38,70),(6,65) ,(38,60),(44,75),(38,65),(6,75) ,(6,70) ,(6,65) ,(6,80) ,(6,55) ,(38,55)]
+    mva5 = [(44,125),(38,130),(6,160) ,(44,110),(38,140),(51,115) ,(6,135) ,(44,145),(38,155),(6,170) ,(6,150) ,(51,135),(6,165) ,(44,115),(6,145) ,(44,135),(38,155),(38,145),(38,165),(38,95) ,(38,160),(44,140),(51,125),(44,120),(38,150),(44,130),(51,110),(6,140) ,(51,130),(51,120),(6,155) ,(6,130) ]
+    mva6 = [(51,95) ,(51,105),(44,100),(51,100)]
+    mva7 = [(6,120) ,(38,125),(6,105) ,(6,125) ,(38,115),(6,110) ,(6,100) ,(38,120)]
+    mva1 = [bramMap[mva] for mva in mva1]
+    mva2 = [bramMap[mva] for mva in mva2]
+    mva3 = [bramMap[mva] for mva in mva3]
+    mva4 = [bramMap[mva] for mva in mva4]
+    mva5 = [bramMap[mva] for mva in mva5]
+    mva6 = [bramMap[mva] for mva in mva6]
+    mva7 = [bramMap[mva] for mva in mva7]
 
     print('')

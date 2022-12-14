@@ -95,7 +95,17 @@ class BRAM36:
         for config,inds,ttVals in moduleConfigs:
             inds = np.array(inds)
             vals = clbUnpacked[inds[:,0],inds[:,1]]
-            _config = config[config.rfind('.')+1:]
+            if '.' in config:
+                bus,_config = config.split('.')
+                if bus == 'BRAM_ADDRBWRADDRU14':
+                    print('')
+                
+                if bus == 'RAMB36' or bus == 'RAMB18_Y0' or bus == 'RAMB18_Y1':
+                    bus = None
+            else:
+                _config = config[config.rfind('.')+1:]
+                bus = None
+                
             bitVal = all(vals == ttVals)
 
             if "RAMB18_Y" in config:
@@ -110,7 +120,12 @@ class BRAM36:
                 toEdit = configs
             
             if ttVals is not None:
-                toEdit[_config] = bitVal
+                
+                if bus is not None:
+                    if bitVal:
+                        toEdit[bus] = _config
+                else:
+                    toEdit[_config] = bitVal
             else:
                 toEdit[_config] = vals
 
@@ -123,28 +138,40 @@ class BRAM36:
         self.ramb18_configs = bramConfigs
         self.ramb36_configs = configs
 
-        # casc_addr_buses = ['ADDRARDADDRL', 'ADDRARDADDRU', 'ADDRBWRADDRL', 'ADDRBWRADDRU']
+        casc_addr_buses = ['ADDRARDADDRL', 'ADDRARDADDRU', 'ADDRBWRADDRL', 'ADDRBWRADDRU']
+        bcab = 'BRAM_CASCINBOT_'
+        bcit = 'BRAM_CASCINTOP_'
+        imux = 'BRAM_R_IMUX_' if self.LR else 'BRAM_IMUX_'
 
-        # for bus in casc_addr_buses:
+        for bus in casc_addr_buses:
             
-        #     conts = ['' for _ in range(15)]
-        #     for i,row in enumerate(self.configs[bus]):
-        #         # for row in item:
-        #         busType = row[0]
-        #         nets = np.array(row[1])
-        #         ttvals = row[2]
-        #         if all(clbUnpacked[nets[:,0],nets[:,1]] == ttvals):
-        #             # if busType == '':
-        #             #     print()
-        #             conts[i//3] = busType
-        #             if 'IMUX' in busType:
-        #                 conts[i//3] = 0
-        #             elif 'CASCINTOP' in busType:
-        #                 conts[i//3] = 1
-        #             else:
-        #                 conts[i//3] = -1
-            
-        #     setattr(self,bus,conts)
+            conts = ['' for _ in range(15)]
+            # for i,row in enumerate(self.configs[bus]):
+            #     # for row in item:
+            #     busType = row[0]
+            #     nets = np.array(row[1])
+            #     ttvals = row[2]
+            #     if all(clbUnpacked[nets[:,0],nets[:,1]] == ttvals):
+            #         # if busType == '':
+            #         #     print()
+            #         conts[i//3] = busType
+            #         if 'IMUX' in busType:
+            #             conts[i//3] = 0
+            #         elif 'CASCINTOP' in busType:
+            #             conts[i//3] = 1
+            #         else:
+            #             conts[i//3] = -1
+            # conts = [configs['BRAM_'+bus+str(i)].split('_')[1+self.LR] for i in range(15)]
+            for i in range(15):
+                cfg = configs['BRAM_'+bus+str(i)]
+                if cfg.startswith('BRAM_R_IMUX'):
+                    idx = 2
+                else:
+                    idx = 1
+                conts[i] = cfg.split('_')[idx]
+                # conts[i] = 'CASCIN_BOT' if vals[0] else 'CASCIN_TOP' if vals[1] else 'IMUX'
+
+            setattr(self,bus,conts)
 
         # if np.max(self.INIT) == 0 and np.max(self.INITP) == 0:
         #     self.IS_FIFO = True
@@ -437,8 +464,8 @@ class BRAM36:
             newIdx = np.empty((test.shape[0],pWidth + iWidth),dtype=np.uint8)
             newIdx[:,:iWidth] = test
             newIdx[:,iWidth:] = test2[:test.shape[0]]
-            # idx_from = newIdx.reshape(-1,256+32)
-            idx_from = newIdx.reshape(-1,576 if self.SYN else 288)
+            idx_from = newIdx.reshape(-1,256+32)
+            # idx_from = newIdx.reshape(-1,576 if self.SYN else 288)
             width = pWidth + iWidth
 
         self.read_width = width
@@ -447,7 +474,7 @@ class BRAM36:
         content = idx_from[:end[0] if len(end) else None].flatten().reshape(-1,width)
         self.content = content
         # end1 = np.where(~content.any(axis=1))[0]
-        # end2 = np.where(~content.any(axis=0))[0]
+        end2 = np.where(~content.any(axis=0))[0]
         # self.content = content
-        # self.content = content[:,:end2[0] if len(end2) else None]
+        self.content = content[:,:end2[0] if len(end2) else None]
         

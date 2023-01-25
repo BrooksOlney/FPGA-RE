@@ -71,7 +71,8 @@ class BRAM36:
         self.extract_from_tiles_v2()
 
     def __repr__(self):
-        return f'BRAM({hex(self.bramFrameData.baseAddr)} - {(self.x,self.y)}) - {(self.grid_x,self.grid_y)}'
+        # return f'BRAM({hex(self.bramFrameData.baseAddr)} - {(self.x,self.y)}) - {(self.grid_x,self.grid_y)}'
+        return self.name
 
     def __hash__(self):
         return hash(self.name)
@@ -457,6 +458,7 @@ class BRAM36:
         pWidth = width // 8
         iWidth = width
 
+
         if pWidth:
             test = idx_from.reshape(-1,iWidth)
             test2 = parity_from.reshape(-1,pWidth)
@@ -469,12 +471,13 @@ class BRAM36:
             width = pWidth + iWidth
 
         self.read_width = width
-        # self.content = idx_from.reshape(-1,width)
+        # self.content = idx_from.flatten().reshape(-1,width)
         end = np.where(~idx_from.any(axis=1))[0]
         content = idx_from[:end[0] if len(end) else None].flatten().reshape(-1,width)
         self.content = content
+        # self.content = idx_from.flatten().reshape(-1,width)
         # end1 = np.where(~content.any(axis=1))[0]
         end2 = np.where(~content.any(axis=0))[0]
         # self.content = content
         self.content = content[:,:end2[0] if len(end2) else None]
-        
+        print('')
